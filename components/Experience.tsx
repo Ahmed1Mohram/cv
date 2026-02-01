@@ -37,8 +37,8 @@ export const Experience: React.FC = () => {
     if (typeof window === 'undefined') return false;
     return window.matchMedia('(max-width: 640px)').matches;
   }, []);
-  const scrollDistance = isMobile ? 3.2 : 2.2;
-  const scrollDamping = isMobile ? 0.12 : 0.09;
+  const scrollDistance = isMobile ? 4.2 : 2.2;
+  const scrollDamping = isMobile ? 0.14 : 0.09;
   const webglAvailable = React.useMemo(() => {
     if (typeof document === 'undefined') return true;
     const c = document.createElement('canvas');

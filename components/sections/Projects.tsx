@@ -8,6 +8,7 @@ import { useStore } from '../../store';
 export const ProjectsSection: React.FC = () => {
   const scroll = useScroll();
   const camera = useThree(state => state.camera);
+  const isMobile = useThree((state) => state.size.width <= 640);
   
   const groupRef = useRef<THREE.Group>(null);
   const [activeProject, setActiveProject] = useState(0);
@@ -16,6 +17,7 @@ export const ProjectsSection: React.FC = () => {
   const prefetchTimerRef = useRef<number | null>(null);
   const progressRef = useRef(0);
   const smoothProgressRef = useRef(0);
+  const smoothOffsetRef = useRef(0);
   const activeProjectRef = useRef(0);
   const sectionVisibleRef = useRef(false);
   const wasVisibleRef = useRef(false);
@@ -81,7 +83,15 @@ export const ProjectsSection: React.FC = () => {
     // Normal Scroll Logic
     const start = 1/5;
     const end = 2/5;
-    const offset = scroll.offset;
+    const dt = Math.min(delta, 1 / 30);
+
+    const offsetLambda = isMobile ? 4.5 : 7;
+    const rawOffset = scroll.offset;
+    if (smoothOffsetRef.current === 0 && rawOffset !== 0) {
+      smoothOffsetRef.current = rawOffset;
+    }
+    const offset = THREE.MathUtils.damp(smoothOffsetRef.current, rawOffset, offsetLambda, dt);
+    smoothOffsetRef.current = offset;
 
     const nextVisible = scroll.visible(start, 1/5);
 
@@ -123,7 +133,8 @@ export const ProjectsSection: React.FC = () => {
       }
     }
 
-    const p = THREE.MathUtils.damp(smoothProgressRef.current, rawP, 3, delta);
+    const progressLambda = isMobile ? 1.6 : 3;
+    const p = THREE.MathUtils.damp(smoothProgressRef.current, rawP, progressLambda, dt);
     smoothProgressRef.current = p;
     progressRef.current = p;
 
