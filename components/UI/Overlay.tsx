@@ -21,9 +21,9 @@ export const Overlay: React.FC = () => {
   const setExpandedProject = useStore(state => state.setExpandedProject);
   const projectsFromStore = useStore(state => state.projects);
 
-  const spaceIconButtonClass = "group relative w-12 h-12 sm:w-14 sm:h-14 rounded-full overflow-hidden bg-white/5 backdrop-blur-md border border-white/20 shadow-[0_0_0_1px_rgba(255,255,255,0.08),0_26px_90px_rgba(0,0,0,0.65)] flex items-center justify-center transition-all duration-300 ease-out hover:bg-white/10 hover:border-white/30 hover:shadow-[0_0_0_1px_rgba(147,197,253,0.32),0_0_40px_rgba(147,197,253,0.22),0_34px_110px_rgba(0,0,0,0.72)] hover:scale-[1.08] active:scale-[0.96] focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-300/70";
-  const spaceIconClass = "w-6 h-6 sm:w-7 sm:h-7 text-white/95 drop-shadow-[0_0_14px_rgba(147,197,253,0.24)] transition-transform duration-300 ease-out group-hover:scale-110";
-  const spaceNumberClass = "text-xs sm:text-sm font-semibold text-white/80 px-3 sm:px-4 py-2 rounded-full bg-white/5 backdrop-blur-md border border-white/15 shadow-[0_0_0_1px_rgba(255,255,255,0.06),0_18px_60px_rgba(0,0,0,0.55)] tracking-wider";
+  const spaceIconButtonClass = "group relative w-11 h-11 sm:w-14 sm:h-14 rounded-full overflow-hidden bg-white/5 backdrop-blur-md border border-white/20 shadow-[0_0_0_1px_rgba(255,255,255,0.08),0_26px_90px_rgba(0,0,0,0.65)] flex items-center justify-center transition-all duration-300 ease-out hover:bg-white/10 hover:border-white/30 hover:shadow-[0_0_0_1px_rgba(147,197,253,0.32),0_0_40px_rgba(147,197,253,0.22),0_34px_110px_rgba(0,0,0,0.72)] hover:scale-[1.08] active:scale-[0.96] focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-300/70";
+  const spaceIconClass = "w-5 h-5 sm:w-7 sm:h-7 text-white/95 drop-shadow-[0_0_14px_rgba(147,197,253,0.24)] transition-transform duration-300 ease-out group-hover:scale-110";
+  const spaceNumberClass = "text-[11px] sm:text-sm font-semibold text-white/80 px-3 sm:px-4 py-2 rounded-full bg-white/5 backdrop-blur-md border border-white/15 shadow-[0_0_0_1px_rgba(255,255,255,0.06),0_18px_60px_rgba(0,0,0,0.55)] tracking-wider whitespace-nowrap";
 
   const whatsappNumber = '01005209667';
   const whatsappUrl = 'https://wa.me/201005209667';
@@ -116,10 +116,11 @@ export const Overlay: React.FC = () => {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -20 }}
-                    className="absolute bottom-28 sm:bottom-24 left-1/2 -translate-x-1/2 pointer-events-auto max-w-[92vw]"
+                    className="absolute left-1/2 -translate-x-1/2 pointer-events-auto max-w-[92vw] w-[92vw] sm:w-auto"
+                    style={{ bottom: 'calc(env(safe-area-inset-bottom) + 6rem)' }}
                     dir="rtl"
                 >
-                    <div className="flex items-center gap-3 sm:gap-4 justify-center">
+                    <div className="flex w-full flex-wrap items-center gap-3 sm:gap-4 justify-center">
                         <a
                             href={whatsappUrl}
                             target="_blank"
@@ -144,10 +145,17 @@ export const Overlay: React.FC = () => {
                             <span className="pointer-events-none absolute inset-0 rounded-full opacity-60 transition-opacity duration-300 group-hover:opacity-100" style={{ background: 'radial-gradient(circle at 30% 30%, rgba(125,211,252,0.16), transparent 55%), radial-gradient(circle at 70% 80%, rgba(167,139,250,0.12), transparent 60%)' }} />
                             <FacebookIcon className={spaceIconClass} />
                         </a>
-                        <div className={`${spaceNumberClass} relative overflow-hidden`}>
+                        <a
+                            href={whatsappUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={`${spaceNumberClass} relative overflow-hidden basis-full sm:basis-auto text-center`}
+                            aria-label={whatsappNumber}
+                            title={whatsappNumber}
+                        >
                             <span className="pointer-events-none absolute inset-0 opacity-70" style={{ background: 'linear-gradient(90deg, rgba(125,211,252,0.10), transparent 40%, rgba(167,139,250,0.10))' }} />
                             {whatsappNumber}
-                        </div>
+                        </a>
                     </div>
                 </motion.div>
             )}
@@ -162,18 +170,23 @@ export const Overlay: React.FC = () => {
             className="absolute bottom-8 sm:bottom-10 left-1/2 -translate-x-1/2 pointer-events-none"
             aria-hidden="true"
           >
-            <div className="group relative w-12 h-12 sm:w-14 sm:h-14 rounded-full overflow-hidden bg-white/5 backdrop-blur-md border border-white/15 shadow-[0_0_0_1px_rgba(255,255,255,0.06),0_18px_70px_rgba(0,0,0,0.65)] flex items-center justify-center">
-              <span
-                className="pointer-events-none absolute -inset-[2px] rounded-full opacity-70 blur-[0.5px]"
-                style={{ background: 'radial-gradient(circle at 50% 50%, rgba(125,211,252,0.18), transparent 62%), radial-gradient(circle at 35% 30%, rgba(167,139,250,0.14), transparent 60%)' }}
-              />
-              <span
-                className="pointer-events-none absolute inset-0 rounded-full opacity-60"
-                style={{ background: 'radial-gradient(circle at 30% 30%, rgba(125,211,252,0.12), transparent 55%), radial-gradient(circle at 70% 80%, rgba(167,139,250,0.1), transparent 60%)' }}
-              />
-              <svg viewBox="0 0 24 24" fill="none" className="relative w-6 h-6 sm:w-7 sm:h-7 text-white/90 drop-shadow-[0_0_16px_rgba(147,197,253,0.25)]">
-                <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
+            <div className="flex flex-col items-center gap-2">
+              <div className="text-[10px] sm:text-xs font-semibold tracking-widest text-white/70">
+                اسكرول داون
+              </div>
+              <div className="group relative w-12 h-12 sm:w-14 sm:h-14 rounded-full overflow-hidden bg-white/5 backdrop-blur-md border border-white/15 shadow-[0_0_0_1px_rgba(255,255,255,0.06),0_18px_70px_rgba(0,0,0,0.65)] flex items-center justify-center">
+                <span
+                  className="pointer-events-none absolute -inset-[2px] rounded-full opacity-70 blur-[0.5px]"
+                  style={{ background: 'radial-gradient(circle at 50% 50%, rgba(125,211,252,0.18), transparent 62%), radial-gradient(circle at 35% 30%, rgba(167,139,250,0.14), transparent 60%)' }}
+                />
+                <span
+                  className="pointer-events-none absolute inset-0 rounded-full opacity-60"
+                  style={{ background: 'radial-gradient(circle at 30% 30%, rgba(125,211,252,0.12), transparent 55%), radial-gradient(circle at 70% 80%, rgba(167,139,250,0.1), transparent 60%)' }}
+                />
+                <svg viewBox="0 0 24 24" fill="none" className="relative w-6 h-6 sm:w-7 sm:h-7 text-white/90 drop-shadow-[0_0_16px_rgba(147,197,253,0.25)]">
+                  <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </div>
             </div>
           </motion.div>
         )}

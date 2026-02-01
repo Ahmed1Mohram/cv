@@ -39,6 +39,7 @@ export const Experience: React.FC = () => {
   }, []);
   const scrollDistance = isMobile ? 4.2 : 2.2;
   const scrollDamping = isMobile ? 0.14 : 0.09;
+  const dprMin = isMobile ? 1.15 : 1;
   const webglAvailable = React.useMemo(() => {
     if (typeof document === 'undefined') return true;
     const c = document.createElement('canvas');
@@ -56,11 +57,11 @@ export const Experience: React.FC = () => {
   return (
     <Canvas
       gl={{ 
-        antialias: false, 
-        powerPreference: "low-power",
+        antialias: isMobile,
+        powerPreference: isMobile ? "high-performance" : "low-power",
         alpha: false
       }}
-      dpr={[1, expandedProject !== null ? (isMobile ? 1.35 : 1.75) : (isMobile ? 1.1 : 1.35)]}
+      dpr={[dprMin, expandedProject !== null ? (isMobile ? 1.7 : 1.75) : (isMobile ? 1.45 : 1.35)]}
       onCreated={({ gl }) => {
         const c = gl.domElement;
         const onLost = (e: Event) => {
@@ -76,7 +77,7 @@ export const Experience: React.FC = () => {
     >
       <color attach="background" args={['#000005']} />
 
-      <AdaptiveDprClamp min={1} />
+      <AdaptiveDprClamp min={dprMin} />
       <AdaptiveEvents />
       
       <Stars radius={140} depth={90} count={900} factor={0.95} saturation={0.25} fade speed={0.06} />
