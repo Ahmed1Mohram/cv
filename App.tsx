@@ -98,7 +98,7 @@ function App() {
 
   return (
     <>
-      <div className="relative w-full h-screen bg-black">
+      <div className="relative w-full h-screen h-[100svh] bg-black">
         <Suspense fallback={null}>
           <CanvasErrorBoundary>
             <Experience />

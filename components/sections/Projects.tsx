@@ -451,10 +451,10 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
             const dist = Math.abs(sectionProgress - center);
             const w = 1 - THREE.MathUtils.clamp(dist / (half || 1), 0, 1);
             const zoomT = THREE.MathUtils.smoothstep(w, 0, 1);
-            const s = THREE.MathUtils.lerp(0.96, 1.32, zoomT);
+            const s = THREE.MathUtils.lerp(0.86, 1.18, zoomT);
             
             const rel = THREE.MathUtils.clamp(index - activeIndex, -2, 2);
-            targetPos.current.set(proj.x, 1 + floatY + zoomT * 0.12, zoomT * 0.75 + floatZ - Math.abs(rel) * 0.08);
+            targetPos.current.set(proj.x, 0.65 + floatY + zoomT * 0.1, zoomT * 0.55 + floatZ - Math.abs(rel) * 0.08);
             targetScale.current.set(s, s, 1);
             const tiltT = 1 - zoomT;
             targetRot.current.set(0.025 * tiltT, rel * 0.12 * tiltT + sway, rel * 0.03 * tiltT);

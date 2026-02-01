@@ -82,10 +82,10 @@ export const CameraHandler: React.FC = () => {
         }
         const w = 1 - THREE.MathUtils.clamp(minDist / (half || 1), 0, 1);
         const zoomT = THREE.MathUtils.smoothstep(w, 0, 1);
-        const z = THREE.MathUtils.lerp(8, 6.8, zoomT);
+        const z = THREE.MathUtils.lerp(9.2, 8.0, zoomT);
 
-        targetPos.set(targetX, 2, z);
-        targetLookAt.set(targetX, 1, 0);
+        targetPos.set(targetX, 1.65, z);
+        targetLookAt.set(targetX, 0.7, 0);
     }
     
     // --- SECTION 3: SKILLS (0.4 - 0.6) ---

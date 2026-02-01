@@ -21,9 +21,9 @@ export const Overlay: React.FC = () => {
   const setExpandedProject = useStore(state => state.setExpandedProject);
   const projectsFromStore = useStore(state => state.projects);
 
-  const spaceIconButtonClass = "group relative w-14 h-14 rounded-full overflow-hidden bg-white/5 backdrop-blur-md border border-white/20 shadow-[0_0_0_1px_rgba(255,255,255,0.08),0_26px_90px_rgba(0,0,0,0.65)] flex items-center justify-center transition-all duration-300 ease-out hover:bg-white/10 hover:border-white/30 hover:shadow-[0_0_0_1px_rgba(147,197,253,0.32),0_0_40px_rgba(147,197,253,0.22),0_34px_110px_rgba(0,0,0,0.72)] hover:scale-[1.08] active:scale-[0.96] focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-300/70";
-  const spaceIconClass = "w-7 h-7 text-white/95 drop-shadow-[0_0_14px_rgba(147,197,253,0.24)] transition-transform duration-300 ease-out group-hover:scale-110";
-  const spaceNumberClass = "text-sm font-semibold text-white/80 px-4 py-2 rounded-full bg-white/5 backdrop-blur-md border border-white/15 shadow-[0_0_0_1px_rgba(255,255,255,0.06),0_18px_60px_rgba(0,0,0,0.55)] tracking-wider";
+  const spaceIconButtonClass = "group relative w-12 h-12 sm:w-14 sm:h-14 rounded-full overflow-hidden bg-white/5 backdrop-blur-md border border-white/20 shadow-[0_0_0_1px_rgba(255,255,255,0.08),0_26px_90px_rgba(0,0,0,0.65)] flex items-center justify-center transition-all duration-300 ease-out hover:bg-white/10 hover:border-white/30 hover:shadow-[0_0_0_1px_rgba(147,197,253,0.32),0_0_40px_rgba(147,197,253,0.22),0_34px_110px_rgba(0,0,0,0.72)] hover:scale-[1.08] active:scale-[0.96] focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-300/70";
+  const spaceIconClass = "w-6 h-6 sm:w-7 sm:h-7 text-white/95 drop-shadow-[0_0_14px_rgba(147,197,253,0.24)] transition-transform duration-300 ease-out group-hover:scale-110";
+  const spaceNumberClass = "text-xs sm:text-sm font-semibold text-white/80 px-3 sm:px-4 py-2 rounded-full bg-white/5 backdrop-blur-md border border-white/15 shadow-[0_0_0_1px_rgba(255,255,255,0.06),0_18px_60px_rgba(0,0,0,0.55)] tracking-wider";
 
   const whatsappNumber = '01005209667';
   const whatsappUrl = 'https://wa.me/201005209667';
@@ -61,11 +61,11 @@ export const Overlay: React.FC = () => {
 
   return (
     <>
-    <main className={`absolute top-0 left-0 w-full h-full pointer-events-none z-10 flex flex-col justify-between p-12 text-white transition-opacity duration-500 ${expandedProject !== null ? 'opacity-0' : 'opacity-100'}`}>
+    <main className={`absolute top-0 left-0 w-full h-full pointer-events-none z-10 flex flex-col justify-between p-4 sm:p-8 lg:p-12 text-white transition-opacity duration-500 ${expandedProject !== null ? 'opacity-0' : 'opacity-100'}`}>
       {/* Header */}
       <header className="flex justify-between items-center w-full">
-        <h1 className="text-2xl font-bold tracking-tighter">معرض أعمال</h1>
-        <div className="text-xs uppercase tracking-widest opacity-50">
+        <h1 className="text-lg sm:text-2xl font-bold tracking-tighter">معرض أعمال</h1>
+        <div className="hidden sm:block text-xs uppercase tracking-widest opacity-50">
            اسحب للاكتشاف
         </div>
       </header>
@@ -83,7 +83,7 @@ export const Overlay: React.FC = () => {
                     className="text-center"
                     dir="rtl"
                 >
-                    <h2 className="text-8xl font-black bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-600">
+                    <h2 className="text-4xl sm:text-6xl lg:text-8xl leading-tight font-black bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-600">
                         مرحبا بك ف عالم<br />
                         أحمد محرم
                     </h2>
@@ -99,11 +99,11 @@ export const Overlay: React.FC = () => {
                     initial={{ opacity: 0, x: -50 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: 50 }}
-                    className="absolute bottom-20 right-10 text-right pointer-events-auto"
+                    className="absolute bottom-10 sm:bottom-20 right-4 sm:right-10 max-w-[92vw] text-right pointer-events-auto"
                     dir="rtl"
                 >
-                    <h2 className="text-6xl font-bold mb-4">أعمال مختارة</h2>
-                    <p className="max-w-md text-sm opacity-70 mb-4">
+                    <h2 className="text-3xl sm:text-5xl lg:text-6xl font-bold mb-3 sm:mb-4">أعمال مختارة</h2>
+                    <p className="max-w-xs sm:max-w-md text-xs sm:text-sm opacity-70 mb-4">
                         مجموعة من التجارب التقنية. <br/>
                         <span className="text-blue-400">اضغط على أي مشروع لعرض التفاصيل.</span>
                     </p>
@@ -116,7 +116,7 @@ export const Overlay: React.FC = () => {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -20 }}
-                    className="absolute bottom-24 left-1/2 -translate-x-1/2 pointer-events-auto"
+                    className="absolute bottom-16 sm:bottom-24 left-1/2 -translate-x-1/2 pointer-events-auto"
                     dir="rtl"
                 >
                     <div className="flex items-center gap-4 justify-center">
@@ -153,13 +153,37 @@ export const Overlay: React.FC = () => {
             )}
             
         </AnimatePresence>
+
+        {currentSection === SECTIONS.INTRO && expandedProject === null && (
+          <motion.div
+            initial={{ opacity: 0, y: -6 }}
+            animate={{ opacity: [0.55, 0.95, 0.55], y: [0, 8, 0] }}
+            transition={{ duration: 1.7, repeat: Infinity, ease: 'easeInOut' }}
+            className="absolute bottom-8 sm:bottom-10 left-1/2 -translate-x-1/2 pointer-events-none"
+            aria-hidden="true"
+          >
+            <div className="group relative w-12 h-12 sm:w-14 sm:h-14 rounded-full overflow-hidden bg-white/5 backdrop-blur-md border border-white/15 shadow-[0_0_0_1px_rgba(255,255,255,0.06),0_18px_70px_rgba(0,0,0,0.65)] flex items-center justify-center">
+              <span
+                className="pointer-events-none absolute -inset-[2px] rounded-full opacity-70 blur-[0.5px]"
+                style={{ background: 'radial-gradient(circle at 50% 50%, rgba(125,211,252,0.18), transparent 62%), radial-gradient(circle at 35% 30%, rgba(167,139,250,0.14), transparent 60%)' }}
+              />
+              <span
+                className="pointer-events-none absolute inset-0 rounded-full opacity-60"
+                style={{ background: 'radial-gradient(circle at 30% 30%, rgba(125,211,252,0.12), transparent 55%), radial-gradient(circle at 70% 80%, rgba(167,139,250,0.1), transparent 60%)' }}
+              />
+              <svg viewBox="0 0 24 24" fill="none" className="relative w-6 h-6 sm:w-7 sm:h-7 text-white/90 drop-shadow-[0_0_16px_rgba(147,197,253,0.25)]">
+                <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </div>
+          </motion.div>
+        )}
       </div>
 
       {/* Footer / Progress */}
       <footer className="w-full flex justify-between items-end">
-         <div className="flex gap-4">
+         <div className="flex flex-wrap gap-2 sm:gap-4">
              {['مقدمة', 'المشاريع', 'المهارات', 'نبذة', 'تواصل'].map((item, idx) => (
-                 <div key={item} className={`text-xs uppercase transition-colors duration-300 ${currentSection === idx ? 'text-white font-bold' : 'text-gray-600'}`}>
+                 <div key={item} className={`text-[10px] sm:text-xs uppercase transition-colors duration-300 ${currentSection === idx ? 'text-white font-bold' : 'text-gray-600'}`}>
                      0{idx+1} {item}
                  </div>
              ))}
@@ -175,18 +199,18 @@ export const Overlay: React.FC = () => {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ delay: 0.5, duration: 0.5 }} // Delay to let 3D animation finish
-                className="absolute top-0 left-0 w-full h-full z-20 flex bg-black/25 pointer-events-auto"
+                className="absolute top-0 left-0 w-full h-full z-20 flex bg-black/25 pointer-events-auto overflow-y-auto sm:overflow-hidden"
             >
                 {/* Content Container */}
-                <div className="container mx-auto flex h-full items-center justify-between p-12">
+                <div className="container mx-auto flex min-h-full flex-col sm:flex-row items-stretch sm:items-center justify-between p-4 sm:p-12">
                     
                     {/* Left Side: Info */}
-                    <div className="w-1/2 flex flex-col items-end space-y-8 pr-12 text-right bg-black/30 p-8" dir="rtl">
+                    <div className="w-full sm:w-1/2 flex flex-col items-end space-y-6 sm:space-y-8 pr-0 sm:pr-12 text-right bg-black/30 p-4 sm:p-8 mt-16 sm:mt-0" dir="rtl">
                          <motion.h2 
                             initial={{ y: 50, opacity: 0 }}
                             animate={{ y: 0, opacity: 1 }}
                             transition={{ delay: 0.7 }}
-                            className="text-7xl font-black text-white"
+                            className="text-3xl sm:text-5xl lg:text-7xl font-black text-white"
                          >
                             {activeInfo.title}
                          </motion.h2>
@@ -203,7 +227,7 @@ export const Overlay: React.FC = () => {
                                     </span>
                                 ))}
                              </div>
-                             <p className="text-xl text-gray-300 max-w-lg leading-relaxed">
+                             <p className="text-base sm:text-lg lg:text-xl text-gray-300 max-w-lg leading-relaxed">
                                 {activeInfo.desc}
                              </p>
                              {activeInfo.details && (
@@ -224,14 +248,14 @@ export const Overlay: React.FC = () => {
                             <div className="flex gap-4 justify-end">
                                 <button
                                   onClick={() => activeInfo?.liveUrl && window.open(activeInfo.liveUrl, '_blank', 'noopener,noreferrer')}
-                                  className="bg-white text-black px-8 py-3 font-bold text-lg hover:bg-gray-200 transition-colors rounded-none"
+                                  className="bg-white text-black px-5 sm:px-8 py-2.5 sm:py-3 font-bold text-base sm:text-lg hover:bg-gray-200 transition-colors rounded-none"
                                 >
                                     عرض مباشر
                                 </button>
                                 {activeInfo?.githubUrl && (
                                   <button
                                     onClick={() => window.open(activeInfo.githubUrl, '_blank', 'noopener,noreferrer')}
-                                    className="border border-white text-white px-8 py-3 font-bold text-lg hover:bg-white/10 transition-colors rounded-none"
+                                    className="border border-white text-white px-5 sm:px-8 py-2.5 sm:py-3 font-bold text-base sm:text-lg hover:bg-white/10 transition-colors rounded-none"
                                   >
                                       جيتهاب
                                   </button>
@@ -241,13 +265,13 @@ export const Overlay: React.FC = () => {
                     </div>
 
                     {/* Right Side: Close Button */}
-                    <div className="absolute top-12 right-12">
+                    <div className="absolute top-4 sm:top-12 right-4 sm:right-12">
                         <button 
                             onClick={() => setExpandedProject(null)}
-                            className="text-white hover:text-red-500 transition-colors text-xl font-bold uppercase tracking-widest flex items-center gap-2"
+                            className="text-white hover:text-red-500 transition-colors text-sm sm:text-xl font-bold uppercase tracking-widest flex items-center gap-2"
                         >
                             <span>إغلاق</span>
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 sm:w-8 sm:h-8">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                             </svg>
                         </button>

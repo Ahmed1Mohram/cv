@@ -33,6 +33,12 @@ const AdaptiveDprClamp: React.FC<{ min?: number }> = ({ min = 1 }) => {
 
 export const Experience: React.FC = () => {
   const expandedProject = useStore((state) => state.expandedProject);
+  const isMobile = React.useMemo(() => {
+    if (typeof window === 'undefined') return false;
+    return window.matchMedia('(max-width: 640px)').matches;
+  }, []);
+  const scrollDistance = isMobile ? 3.2 : 2.2;
+  const scrollDamping = isMobile ? 0.12 : 0.09;
   const webglAvailable = React.useMemo(() => {
     if (typeof document === 'undefined') return true;
     const c = document.createElement('canvas');
@@ -54,7 +60,7 @@ export const Experience: React.FC = () => {
         powerPreference: "low-power",
         alpha: false
       }}
-      dpr={[1, expandedProject !== null ? 1.75 : 1.35]}
+      dpr={[1, expandedProject !== null ? (isMobile ? 1.35 : 1.75) : (isMobile ? 1.1 : 1.35)]}
       onCreated={({ gl }) => {
         const c = gl.domElement;
         const onLost = (e: Event) => {
@@ -77,7 +83,7 @@ export const Experience: React.FC = () => {
       <Stars radius={70} depth={35} count={180} factor={1.35} saturation={0.1} fade speed={0.1} />
       <Sparkles count={85} speed={0.25} opacity={0.9} color="#ffffff" size={1.2} scale={[90, 60, 90]} noise={0.85} />
       
-      <ScrollControls pages={TOTAL_SECTIONS} damping={0.06}>
+      <ScrollControls pages={TOTAL_SECTIONS} damping={scrollDamping} distance={scrollDistance}>
         <CameraHandler />
         
         <ambientLight intensity={0.1} />
