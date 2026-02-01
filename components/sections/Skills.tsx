@@ -3,12 +3,49 @@ import { useFrame, useThree } from '@react-three/fiber';
 import { Billboard, useScroll, Sphere, Text } from '@react-three/drei';
 import * as THREE from 'three';
 
-export const SkillsSection: React.FC = () => {
+type QualityTier = 'low' | 'medium' | 'high';
+
+export const SkillsSection: React.FC<{ quality?: QualityTier }> = ({ quality = 'high' }) => {
   const scroll = useScroll();
   const isMobile = useThree((state) => state.size.width <= 640);
   const groupRef = useRef<THREE.Group>(null);
   const sunRef = useRef<THREE.Group>(null);
   const visibleRef = useRef(false);
+  const meteorTargetsRef = useRef<Array<{ pos: THREE.Vector3; radius: number }>>([]);
+
+  const sunGlowTexture = useMemo(() => {
+      if (typeof document === 'undefined') return null;
+      const canvas = document.createElement('canvas');
+      canvas.width = 256;
+      canvas.height = 256;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return null;
+
+      const cx = canvas.width / 2;
+      const cy = canvas.height / 2;
+      const r = canvas.width / 2;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+      g.addColorStop(0.0, 'rgba(255,255,255,1.0)');
+      g.addColorStop(0.08, 'rgba(255,244,220,0.98)');
+      g.addColorStop(0.22, 'rgba(255,196,120,0.65)');
+      g.addColorStop(0.48, 'rgba(255,128,36,0.24)');
+      g.addColorStop(1.0, 'rgba(255,90,10,0.0)');
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, 0, Math.PI * 2);
+      ctx.fill();
+
+      const tex = new THREE.CanvasTexture(canvas);
+      tex.colorSpace = THREE.SRGBColorSpace;
+      tex.minFilter = THREE.LinearFilter;
+      tex.magFilter = THREE.LinearFilter;
+      tex.wrapS = THREE.ClampToEdgeWrapping;
+      tex.wrapT = THREE.ClampToEdgeWrapping;
+      tex.needsUpdate = true;
+      return tex;
+  }, []);
   
   // Fully procedural planets to avoid texture loading failures
   const planets = [
@@ -22,6 +59,10 @@ export const SkillsSection: React.FC = () => {
       { name: "Next.js", color: "#111111", type: "rocky", size: 0.26, distance: 9.9, speed: 0.34 },
       { name: "Three.js", color: "#ffffff", type: "ice", size: 0.3, distance: 11.2, speed: 0.28 },
   ];
+
+  if (meteorTargetsRef.current.length !== planets.length) {
+      meteorTargetsRef.current = planets.map((p) => ({ pos: new THREE.Vector3(), radius: p.size }));
+  }
 
   useFrame(() => {
     const start = 2/5; 
@@ -40,7 +81,7 @@ export const SkillsSection: React.FC = () => {
 
   return (
     <group ref={groupRef}>
-      <Galaxies enabledRef={visibleRef} />
+      <Galaxies enabledRef={visibleRef} quality={quality} />
 
       {/* THE SUN */}
       <group ref={sunRef} scale={isMobile ? 0.78 : 1}>
@@ -48,7 +89,7 @@ export const SkillsSection: React.FC = () => {
             <meshStandardMaterial
               color="#ffdfb0"
               emissive="#ffb44d"
-              emissiveIntensity={isMobile ? 1.65 : 2.4}
+              emissiveIntensity={isMobile ? 2.35 : 3.4}
               roughness={0.95}
               metalness={0}
               toneMapped={false}
@@ -58,7 +99,7 @@ export const SkillsSection: React.FC = () => {
             <meshStandardMaterial
               color="#fff0d4"
               emissive="#ffd39a"
-              emissiveIntensity={isMobile ? 1.35 : 2.1}
+              emissiveIntensity={isMobile ? 1.95 : 3.0}
               roughness={0.7}
               metalness={0}
               transparent
@@ -70,19 +111,44 @@ export const SkillsSection: React.FC = () => {
             <meshBasicMaterial
               color="#ff7a18"
               transparent
-              opacity={isMobile ? 0.07 : 0.12}
+              opacity={isMobile ? 0.1 : 0.18}
               blending={THREE.AdditiveBlending}
               depthWrite={false}
               side={THREE.BackSide}
               toneMapped={false}
             />
           </Sphere>
+
+          <Sphere args={[2.25, 32, 32]}>
+            <meshBasicMaterial
+              color="#ffb14a"
+              transparent
+              opacity={isMobile ? 0.08 : 0.14}
+              blending={THREE.AdditiveBlending}
+              depthWrite={false}
+              side={THREE.BackSide}
+              toneMapped={false}
+            />
+          </Sphere>
+
+          {sunGlowTexture && (
+            <sprite scale={[isMobile ? 7.8 : 10.5, isMobile ? 7.8 : 10.5, 1]}>
+              <spriteMaterial
+                map={sunGlowTexture}
+                transparent
+                opacity={isMobile ? 0.55 : 0.7}
+                blending={THREE.AdditiveBlending}
+                depthWrite={false}
+                toneMapped={false}
+              />
+            </sprite>
+          )}
           
           <pointLight 
             color="#ffeedd" 
-            intensity={isMobile ? 2.2 : 3.5} 
-            distance={isMobile ? 34 : 50} 
-            decay={1} 
+            intensity={isMobile ? 3.8 : 6.8} 
+            distance={isMobile ? 48 : 75} 
+            decay={2} 
           />
       </group>
 
@@ -96,11 +162,12 @@ export const SkillsSection: React.FC = () => {
             {...planet} 
             index={i} 
             total={planets.length}
+            meteorTarget={meteorTargetsRef.current[i]}
          />
       ))}
 
-      <Asteroids enabledRef={visibleRef} />
-      <Meteors enabledRef={visibleRef} />
+      <Asteroids enabledRef={visibleRef} quality={quality} />
+      <Meteors enabledRef={visibleRef} targetsRef={meteorTargetsRef} quality={quality} />
     </group>
   );
 };
@@ -135,7 +202,7 @@ const Orbit: React.FC<{ radius: number }> = ({ radius }) => {
     );
 };
 
-const Galaxies: React.FC<{ enabledRef: React.MutableRefObject<boolean> }> = ({ enabledRef }) => {
+const Galaxies: React.FC<{ enabledRef: React.MutableRefObject<boolean>; quality: QualityTier }> = ({ enabledRef, quality }) => {
     const group = useRef<THREE.Group>(null);
 
     const makeGalaxy = useMemo(() => {
@@ -195,8 +262,14 @@ const Galaxies: React.FC<{ enabledRef: React.MutableRefObject<boolean> }> = ({ e
     }, []);
 
     const galaxyA = useMemo(() => {
+        const count = quality === 'high'
+            ? 14000
+            : quality === 'medium'
+                ? 9000
+                : 4500;
+
         return makeGalaxy({
-            count: 14000,
+            count,
             radius: 55,
             branches: 5,
             spin: 0.28,
@@ -207,11 +280,17 @@ const Galaxies: React.FC<{ enabledRef: React.MutableRefObject<boolean> }> = ({ e
             insideColor: '#fff2cf',
             outsideColor: '#8ab4ff',
         });
-    }, [makeGalaxy]);
+    }, [makeGalaxy, quality]);
 
     const galaxyB = useMemo(() => {
+        const count = quality === 'high'
+            ? 10000
+            : quality === 'medium'
+                ? 6500
+                : 3200;
+
         return makeGalaxy({
-            count: 10000,
+            count,
             radius: 42,
             branches: 4,
             spin: 0.34,
@@ -222,7 +301,7 @@ const Galaxies: React.FC<{ enabledRef: React.MutableRefObject<boolean> }> = ({ e
             insideColor: '#ffe2f3',
             outsideColor: '#a78bfa',
         });
-    }, [makeGalaxy]);
+    }, [makeGalaxy, quality]);
 
     useFrame((state) => {
         if (!group.current) return;
@@ -263,14 +342,15 @@ const Galaxies: React.FC<{ enabledRef: React.MutableRefObject<boolean> }> = ({ e
     );
 };
 
-const Asteroids: React.FC<{ enabledRef: React.MutableRefObject<boolean> }> = ({ enabledRef }) => {
+const Asteroids: React.FC<{ enabledRef: React.MutableRefObject<boolean>; quality: QualityTier }> = ({ enabledRef, quality }) => {
     const mesh = useRef<THREE.InstancedMesh>(null);
     const isMobile = useThree((state) => state.size.width <= 640);
     const tmpColor = useRef(new THREE.Color());
     const dummy = useMemo(() => new THREE.Object3D(), []);
 
     const asteroids = useMemo(() => {
-        const count = isMobile ? 18 : 28;
+        const base = isMobile ? 8 : 12;
+        const count = quality === 'high' ? base : quality === 'medium' ? Math.max(4, Math.round(base * 0.75)) : Math.max(3, Math.round(base * 0.5));
         const arr: Array<{
             pos: THREE.Vector3;
             vel: THREE.Vector3;
@@ -303,7 +383,7 @@ const Asteroids: React.FC<{ enabledRef: React.MutableRefObject<boolean> }> = ({ 
             });
         }
         return arr;
-    }, [isMobile]);
+    }, [isMobile, quality]);
 
     useFrame((state, delta) => {
         if (!mesh.current) return;
@@ -363,12 +443,47 @@ const Asteroids: React.FC<{ enabledRef: React.MutableRefObject<boolean> }> = ({ 
     );
 };
 
-const Meteors: React.FC<{ enabledRef: React.MutableRefObject<boolean> }> = ({ enabledRef }) => {
+const Meteors: React.FC<{ enabledRef: React.MutableRefObject<boolean>; targetsRef: React.MutableRefObject<Array<{ pos: THREE.Vector3; radius: number }>>; quality: QualityTier }> = ({ enabledRef, targetsRef, quality }) => {
     const trailMesh = useRef<THREE.InstancedMesh>(null);
     const headMesh = useRef<THREE.InstancedMesh>(null);
+    const impactMesh = useRef<THREE.InstancedMesh>(null);
+    const isMobile = useThree((state) => state.size.width <= 640);
     const tmpPos = useRef(new THREE.Vector3());
     const tmpVel = useRef(new THREE.Vector3());
     const tmpColor = useRef(new THREE.Color());
+
+    const sparkTexture = useMemo(() => {
+        if (typeof document === 'undefined') return null;
+        const canvas = document.createElement('canvas');
+        canvas.width = 128;
+        canvas.height = 128;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return null;
+
+        const cx = canvas.width / 2;
+        const cy = canvas.height / 2;
+        const r = canvas.width / 2;
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+        g.addColorStop(0.0, 'rgba(255,255,255,1.0)');
+        g.addColorStop(0.12, 'rgba(220,245,255,0.95)');
+        g.addColorStop(0.32, 'rgba(170,210,255,0.40)');
+        g.addColorStop(1.0, 'rgba(120,160,255,0.00)');
+        ctx.fillStyle = g;
+        ctx.beginPath();
+        ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        ctx.fill();
+
+        const tex = new THREE.CanvasTexture(canvas);
+        tex.colorSpace = THREE.SRGBColorSpace;
+        tex.minFilter = THREE.LinearFilter;
+        tex.magFilter = THREE.LinearFilter;
+        tex.wrapS = THREE.ClampToEdgeWrapping;
+        tex.wrapT = THREE.ClampToEdgeWrapping;
+        tex.needsUpdate = true;
+        return tex;
+    }, []);
 
     const trailTexture = useMemo(() => {
         if (typeof document === 'undefined') return null;
@@ -410,14 +525,18 @@ const Meteors: React.FC<{ enabledRef: React.MutableRefObject<boolean> }> = ({ en
     }, []);
 
     const meteors = useMemo(() => {
-        const count = 18;
-        const arr: Array<{ pos: THREE.Vector3; vel: THREE.Vector3; len: number; width: number; rotY: number; cooldown: number; age: number; ttl: number; fast: boolean; warm: boolean }> = [];
+        const base = isMobile ? 5 : 8;
+        const count = quality === 'high' ? base : quality === 'medium' ? Math.max(3, Math.round(base * 0.75)) : Math.max(2, Math.round(base * 0.5));
+        const arr: Array<{ pos: THREE.Vector3; vel: THREE.Vector3; targetRef: { pos: THREE.Vector3; radius: number } | null; target: THREE.Vector3; hitR: number; len: number; width: number; rotY: number; cooldown: number; age: number; ttl: number; fast: boolean; warm: boolean; impactAge: number; impactTtl: number; impactPos: THREE.Vector3 }> = [];
         for (let i = 0; i < count; i++) {
             const fast = Math.random() < 0.38;
             const warm = Math.random() < 0.45;
             arr.push({
                 pos: new THREE.Vector3(0, 999, 0),
                 vel: new THREE.Vector3(),
+                targetRef: null,
+                target: new THREE.Vector3(),
+                hitR: 0.4,
                 len: fast ? THREE.MathUtils.lerp(1.6, 2.8, Math.random()) : THREE.MathUtils.lerp(0.9, 1.7, Math.random()),
                 width: fast ? THREE.MathUtils.lerp(0.05, 0.085, Math.random()) : THREE.MathUtils.lerp(0.03, 0.06, Math.random()),
                 rotY: THREE.MathUtils.lerp(-0.8, 0.8, Math.random()),
@@ -426,36 +545,110 @@ const Meteors: React.FC<{ enabledRef: React.MutableRefObject<boolean> }> = ({ en
                 ttl: fast ? THREE.MathUtils.lerp(0.55, 1.05, Math.random()) : THREE.MathUtils.lerp(1.2, 2.4, Math.random()),
                 fast,
                 warm,
+                impactAge: 999,
+                impactTtl: 0.22,
+                impactPos: new THREE.Vector3(0, 999, 0),
             });
         }
         return arr;
-    }, []);
+    }, [isMobile, quality]);
 
     const dummy = useMemo(() => new THREE.Object3D(), []);
 
-    const respawn = (m: { pos: THREE.Vector3; vel: THREE.Vector3; cooldown: number; age: number; ttl: number; fast: boolean }) => {
-        m.pos.set(
-            THREE.MathUtils.lerp(-14, 14, Math.random()),
-            THREE.MathUtils.lerp(6, 12, Math.random()),
-            THREE.MathUtils.lerp(-12, 12, Math.random())
-        );
-        const sx = m.fast ? THREE.MathUtils.lerp(-10.5, -7.0, Math.random()) : THREE.MathUtils.lerp(-4.8, -2.6, Math.random());
-        const sy = m.fast ? THREE.MathUtils.lerp(-12.5, -8.5, Math.random()) : THREE.MathUtils.lerp(-5.8, -3.6, Math.random());
-        const sz = m.fast ? THREE.MathUtils.lerp(-2.0, 2.0, Math.random()) : THREE.MathUtils.lerp(-1.0, 1.0, Math.random());
-        m.vel.set(sx, sy, sz);
+    const pickTarget = (targetsRef?: React.MutableRefObject<Array<{ pos: THREE.Vector3; radius: number }>>) => {
+        const list = targetsRef?.current;
+        if (!list || list.length === 0) return null;
+        const idx = Math.floor(Math.random() * list.length);
+        const t = list[idx];
+        if (!t) return null;
+        return t;
+    };
+
+    const respawn = (
+        m: { pos: THREE.Vector3; vel: THREE.Vector3; targetRef: { pos: THREE.Vector3; radius: number } | null; target: THREE.Vector3; hitR: number; cooldown: number; age: number; ttl: number; fast: boolean },
+        targetsRef?: React.MutableRefObject<Array<{ pos: THREE.Vector3; radius: number }>>
+    ) => {
+        const t = pickTarget(targetsRef);
+        if (t) {
+            m.targetRef = t;
+            m.target.copy(t.pos);
+            m.hitR = t.radius * 1.05;
+
+            const dir = new THREE.Vector3(
+                THREE.MathUtils.lerp(-1, 1, Math.random()),
+                THREE.MathUtils.lerp(0.25, 1.0, Math.random()),
+                THREE.MathUtils.lerp(-1, 1, Math.random())
+            ).normalize();
+
+            const spawnDist = m.fast ? THREE.MathUtils.lerp(13, 18, Math.random()) : THREE.MathUtils.lerp(10, 15, Math.random());
+            const offset = new THREE.Vector3(
+                THREE.MathUtils.lerp(-0.18, 0.18, Math.random()),
+                THREE.MathUtils.lerp(-0.12, 0.12, Math.random()),
+                THREE.MathUtils.lerp(-0.18, 0.18, Math.random())
+            );
+
+            m.pos.copy(m.target).addScaledVector(dir, spawnDist);
+            tmpPos.current.copy(m.target).add(offset);
+
+            tmpVel.current.copy(tmpPos.current).sub(m.pos);
+            const dist = Math.max(0.001, tmpVel.current.length());
+            tmpVel.current.normalize();
+            const speed = m.fast ? THREE.MathUtils.lerp(16, 24, Math.random()) : THREE.MathUtils.lerp(11, 17, Math.random());
+            m.vel.copy(tmpVel.current).multiplyScalar(speed);
+            m.ttl = dist / speed;
+        } else {
+            m.targetRef = null;
+            m.pos.set(
+                THREE.MathUtils.lerp(-14, 14, Math.random()),
+                THREE.MathUtils.lerp(6, 12, Math.random()),
+                THREE.MathUtils.lerp(-12, 12, Math.random())
+            );
+            const sx = m.fast ? THREE.MathUtils.lerp(-10.5, -7.0, Math.random()) : THREE.MathUtils.lerp(-4.8, -2.6, Math.random());
+            const sy = m.fast ? THREE.MathUtils.lerp(-12.5, -8.5, Math.random()) : THREE.MathUtils.lerp(-5.8, -3.6, Math.random());
+            const sz = m.fast ? THREE.MathUtils.lerp(-2.0, 2.0, Math.random()) : THREE.MathUtils.lerp(-1.0, 1.0, Math.random());
+            m.vel.set(sx, sy, sz);
+            m.ttl = m.fast ? THREE.MathUtils.lerp(0.55, 1.05, Math.random()) : THREE.MathUtils.lerp(1.2, 2.4, Math.random());
+        }
+
         m.cooldown = 0;
         m.age = 0;
-        m.ttl = m.fast ? THREE.MathUtils.lerp(0.55, 1.05, Math.random()) : THREE.MathUtils.lerp(1.2, 2.4, Math.random());
     };
 
     useFrame((state, delta) => {
-        if (!trailMesh.current || !headMesh.current) return;
+        if (!trailMesh.current || !headMesh.current || !impactMesh.current) return;
         if (!enabledRef.current) return;
 
         const dt = Math.min(delta, 1 / 30);
 
         for (let i = 0; i < meteors.length; i++) {
             const m = meteors[i];
+
+            if (m.impactAge < (m.impactTtl || 0)) {
+                m.impactAge += dt;
+                const p = THREE.MathUtils.clamp(m.impactAge / (m.impactTtl || 1), 0, 1);
+                const grow = THREE.MathUtils.smoothstep(p, 0, 0.25);
+                const fade = 1 - THREE.MathUtils.smoothstep(p, 0.25, 1);
+                const s = (m.hitR * 1.65) * (0.85 + grow * 0.65);
+
+                dummy.position.copy(m.impactPos);
+                dummy.quaternion.copy(state.camera.quaternion);
+                dummy.scale.set(s, s, s);
+                dummy.updateMatrix();
+                impactMesh.current.setMatrixAt(i, dummy.matrix);
+
+                const b = THREE.MathUtils.clamp(fade * 2.2, 0, 2.2);
+                tmpColor.current.setRGB(0.85 * b, 0.95 * b, 1.0 * b);
+                impactMesh.current.setColorAt(i, tmpColor.current);
+            } else {
+                dummy.position.set(0, 999, 0);
+                dummy.quaternion.set(0, 0, 0, 1);
+                dummy.scale.set(0.0001, 0.0001, 0.0001);
+                dummy.updateMatrix();
+                impactMesh.current.setMatrixAt(i, dummy.matrix);
+                tmpColor.current.setRGB(0, 0, 0);
+                impactMesh.current.setColorAt(i, tmpColor.current);
+            }
+
             if (m.cooldown > 0) {
                 m.cooldown -= dt;
                 dummy.position.set(0, 999, 0);
@@ -464,19 +657,19 @@ const Meteors: React.FC<{ enabledRef: React.MutableRefObject<boolean> }> = ({ en
                 dummy.updateMatrix();
                 trailMesh.current.setMatrixAt(i, dummy.matrix);
                 headMesh.current.setMatrixAt(i, dummy.matrix);
-                if (trailMesh.current.instanceColor) {
-                    tmpColor.current.setRGB(0, 0, 0);
-                    trailMesh.current.setColorAt(i, tmpColor.current);
-                }
-                if (headMesh.current.instanceColor) {
-                    tmpColor.current.setRGB(0, 0, 0);
-                    headMesh.current.setColorAt(i, tmpColor.current);
-                }
+                tmpColor.current.setRGB(0, 0, 0);
+                trailMesh.current.setColorAt(i, tmpColor.current);
+                headMesh.current.setColorAt(i, tmpColor.current);
                 continue;
             }
 
             if (m.pos.y > 900) {
-                respawn(m);
+                respawn(m, targetsRef);
+            }
+
+            if (m.targetRef) {
+                m.target.copy(m.targetRef.pos);
+                m.hitR = m.targetRef.radius * 1.05;
             }
 
             m.age += dt;
@@ -489,6 +682,38 @@ const Meteors: React.FC<{ enabledRef: React.MutableRefObject<boolean> }> = ({ en
             const speedBoost = m.fast ? 1.15 : 1;
             m.pos.addScaledVector(tmpVel.current, dt * speedBoost);
 
+            const currentSpeed = m.vel.length();
+            tmpPos.current.copy(m.target).sub(m.pos);
+            const dTo = tmpPos.current.length();
+            if (dTo > 0.001 && currentSpeed > 0.001) {
+                tmpPos.current.multiplyScalar(1 / dTo);
+                const steer = isMobile ? 2.2 : 3.0;
+                const alpha = 1 - Math.exp(-steer * dt);
+                tmpPos.current.multiplyScalar(currentSpeed);
+                m.vel.lerp(tmpPos.current, alpha);
+            }
+
+            const hitDist = m.pos.distanceTo(m.target);
+            if (hitDist <= (m.hitR || 0.4)) {
+                m.impactAge = 0;
+                tmpPos.current.copy(m.pos).sub(m.target);
+                if (tmpPos.current.lengthSq() > 1e-6) tmpPos.current.normalize();
+                m.impactPos.copy(m.target).addScaledVector(tmpPos.current, (m.hitR || 0.4) * 0.98);
+                m.pos.set(0, 999, 0);
+                m.cooldown = m.fast ? THREE.MathUtils.lerp(0.35, 1.25, Math.random()) : THREE.MathUtils.lerp(0.85, 2.8, Math.random());
+
+                dummy.position.set(0, 999, 0);
+                dummy.rotation.set(0, 0, 0);
+                dummy.scale.set(0.0001, 0.0001, 0.0001);
+                dummy.updateMatrix();
+                trailMesh.current.setMatrixAt(i, dummy.matrix);
+                headMesh.current.setMatrixAt(i, dummy.matrix);
+                tmpColor.current.setRGB(0, 0, 0);
+                trailMesh.current.setColorAt(i, tmpColor.current);
+                headMesh.current.setColorAt(i, tmpColor.current);
+                continue;
+            }
+
             const out = (m.pos.y < -4) || (m.pos.x < -22) || (m.pos.z < -20) || (m.pos.z > 20);
             if (out || life >= 1) {
                 m.pos.set(0, 999, 0);
@@ -499,14 +724,9 @@ const Meteors: React.FC<{ enabledRef: React.MutableRefObject<boolean> }> = ({ en
                 dummy.updateMatrix();
                 trailMesh.current.setMatrixAt(i, dummy.matrix);
                 headMesh.current.setMatrixAt(i, dummy.matrix);
-                if (trailMesh.current.instanceColor) {
-                    tmpColor.current.setRGB(0, 0, 0);
-                    trailMesh.current.setColorAt(i, tmpColor.current);
-                }
-                if (headMesh.current.instanceColor) {
-                    tmpColor.current.setRGB(0, 0, 0);
-                    headMesh.current.setColorAt(i, tmpColor.current);
-                }
+                tmpColor.current.setRGB(0, 0, 0);
+                trailMesh.current.setColorAt(i, tmpColor.current);
+                headMesh.current.setColorAt(i, tmpColor.current);
                 continue;
             }
 
@@ -536,58 +756,69 @@ const Meteors: React.FC<{ enabledRef: React.MutableRefObject<boolean> }> = ({ en
             dummy.updateMatrix();
             headMesh.current.setMatrixAt(i, dummy.matrix);
 
-            const base = m.fast ? 1.65 : 1.05;
-            const b = THREE.MathUtils.clamp(intensity * base, 0, 1.8);
-            if (trailMesh.current.instanceColor) {
-                if (m.warm) tmpColor.current.setRGB(1.0 * b, 0.62 * b, 0.25 * b);
-                else tmpColor.current.setRGB(0.70 * b, 0.90 * b, 1.0 * b);
-                trailMesh.current.setColorAt(i, tmpColor.current);
-            }
+            const base = m.fast ? 2.1 : 1.4;
+            const b = THREE.MathUtils.clamp(intensity * base, 0, 3.0);
+            if (m.warm) tmpColor.current.setRGB(1.0 * b, 0.62 * b, 0.25 * b);
+            else tmpColor.current.setRGB(0.70 * b, 0.90 * b, 1.0 * b);
+            trailMesh.current.setColorAt(i, tmpColor.current);
 
-            if (headMesh.current.instanceColor) {
-                const hb = THREE.MathUtils.clamp(b * 1.15, 0, 2.25);
-                if (m.warm) tmpColor.current.setRGB(1.0 * hb, 0.78 * hb, 0.45 * hb);
-                else tmpColor.current.setRGB(0.85 * hb, 1.0 * hb, 1.0 * hb);
-                headMesh.current.setColorAt(i, tmpColor.current);
-            }
+            const hb = THREE.MathUtils.clamp(b * 1.25, 0, 3.2);
+            if (m.warm) tmpColor.current.setRGB(1.0 * hb, 0.78 * hb, 0.45 * hb);
+            else tmpColor.current.setRGB(0.85 * hb, 1.0 * hb, 1.0 * hb);
+            headMesh.current.setColorAt(i, tmpColor.current);
         }
 
         trailMesh.current.instanceMatrix.needsUpdate = true;
         if (trailMesh.current.instanceColor) trailMesh.current.instanceColor.needsUpdate = true;
         headMesh.current.instanceMatrix.needsUpdate = true;
         if (headMesh.current.instanceColor) headMesh.current.instanceColor.needsUpdate = true;
+        impactMesh.current.instanceMatrix.needsUpdate = true;
+        if (impactMesh.current.instanceColor) impactMesh.current.instanceColor.needsUpdate = true;
     });
 
     return (
         <group>
-            <instancedMesh ref={trailMesh} args={[undefined, undefined, meteors.length]} frustumCulled={false}>
+            <instancedMesh key={`trail-${meteors.length}`} ref={trailMesh} args={[undefined, undefined, meteors.length]} frustumCulled={false}>
                 <planeGeometry args={[1, 1]} />
                 <meshBasicMaterial
                     map={trailTexture ?? undefined}
                     transparent
-                    opacity={0.85}
+                    opacity={0.96}
                     blending={THREE.AdditiveBlending}
                     depthWrite={false}
                     toneMapped={false}
                     vertexColors
                 />
             </instancedMesh>
-            <instancedMesh ref={headMesh} args={[undefined, undefined, meteors.length]} frustumCulled={false}>
+            <instancedMesh key={`head-${meteors.length}`} ref={headMesh} args={[undefined, undefined, meteors.length]} frustumCulled={false}>
                 <sphereGeometry args={[1, 12, 12]} />
                 <meshBasicMaterial
+                    transparent
+                    opacity={1}
+                    blending={THREE.AdditiveBlending}
+                    depthWrite={false}
+                    toneMapped={false}
+                    vertexColors
+                />
+            </instancedMesh>
+            <instancedMesh key={`impact-${meteors.length}`} ref={impactMesh} args={[undefined, undefined, meteors.length]} frustumCulled={false}>
+                <planeGeometry args={[1, 1]} />
+                <meshBasicMaterial
+                    map={sparkTexture ?? undefined}
                     transparent
                     opacity={0.95}
                     blending={THREE.AdditiveBlending}
                     depthWrite={false}
                     toneMapped={false}
                     vertexColors
+                    side={THREE.DoubleSide}
                 />
             </instancedMesh>
         </group>
     );
 };
 
-const Planet = ({ name, color, type, size, distance, speed, index, total }: any) => {
+const Planet = ({ name, color, type, size, distance, speed, index, total, meteorTarget }: any) => {
     const planetRef = useRef<THREE.Group>(null);
     const meshRef = useRef<THREE.Mesh>(null);
     const denom = (typeof total === 'number' && total > 0) ? total : 9;
@@ -598,6 +829,10 @@ const Planet = ({ name, color, type, size, distance, speed, index, total }: any)
             const t = state.clock.getElapsedTime() * speed * 0.2;
             planetRef.current.position.x = Math.sin(t + initialAngle) * distance;
             planetRef.current.position.z = Math.cos(t + initialAngle) * distance;
+
+            if (meteorTarget?.pos) {
+                planetRef.current.getWorldPosition(meteorTarget.pos);
+            }
         }
         if (meshRef.current) {
             meshRef.current.rotation.y += 0.005;
