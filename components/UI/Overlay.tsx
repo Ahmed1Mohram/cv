@@ -21,6 +21,11 @@ export const Overlay: React.FC = () => {
   const setExpandedProject = useStore(state => state.setExpandedProject);
   const projectsFromStore = useStore(state => state.projects);
 
+  const isMobile = React.useMemo(() => {
+    if (typeof window === 'undefined') return false;
+    return window.matchMedia('(max-width: 640px)').matches;
+  }, []);
+
   const spaceIconButtonClass = "group relative w-11 h-11 sm:w-14 sm:h-14 rounded-full overflow-hidden bg-white/5 backdrop-blur-md border border-white/20 shadow-[0_0_0_1px_rgba(255,255,255,0.08),0_26px_90px_rgba(0,0,0,0.65)] flex items-center justify-center transition-all duration-300 ease-out hover:bg-white/10 hover:border-white/30 hover:shadow-[0_0_0_1px_rgba(147,197,253,0.32),0_0_40px_rgba(147,197,253,0.22),0_34px_110px_rgba(0,0,0,0.72)] hover:scale-[1.08] active:scale-[0.96] focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-300/70";
   const spaceIconClass = "w-5 h-5 sm:w-7 sm:h-7 text-white/95 drop-shadow-[0_0_14px_rgba(147,197,253,0.24)] transition-transform duration-300 ease-out group-hover:scale-110";
   const spaceNumberClass = "text-[11px] sm:text-sm font-semibold text-white/80 px-3 sm:px-4 py-2 rounded-full bg-white/5 backdrop-blur-md border border-white/15 shadow-[0_0_0_1px_rgba(255,255,255,0.06),0_18px_60px_rgba(0,0,0,0.55)] tracking-wider whitespace-nowrap";
@@ -167,12 +172,13 @@ export const Overlay: React.FC = () => {
             initial={{ opacity: 0, y: -6 }}
             animate={{ opacity: [0.55, 0.95, 0.55], y: [0, 8, 0] }}
             transition={{ duration: 1.7, repeat: Infinity, ease: 'easeInOut' }}
-            className="absolute bottom-8 sm:bottom-10 left-1/2 -translate-x-1/2 pointer-events-none"
+            className="absolute left-1/2 -translate-x-1/2 pointer-events-none sm:bottom-10"
+            style={isMobile ? { bottom: 'calc(env(safe-area-inset-bottom) + 12rem)' } : undefined}
             aria-hidden="true"
           >
             <div className="flex flex-col items-center gap-2">
               <div className="text-[10px] sm:text-xs font-semibold tracking-widest text-white/70">
-         Scroll Down
+                Scroll Down
               </div>
               <div className="group relative w-12 h-12 sm:w-14 sm:h-14 rounded-full overflow-hidden bg-white/5 backdrop-blur-md border border-white/15 shadow-[0_0_0_1px_rgba(255,255,255,0.06),0_18px_70px_rgba(0,0,0,0.65)] flex items-center justify-center">
                 <span

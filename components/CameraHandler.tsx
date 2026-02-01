@@ -1,11 +1,12 @@
 import React, { useRef } from 'react';
-import { useFrame } from '@react-three/fiber';
+import { useFrame, useThree } from '@react-three/fiber';
 import { useScroll } from '@react-three/drei';
 import * as THREE from 'three';
 import { useStore } from '../store';
 
 export const CameraHandler: React.FC = () => {
   const scroll = useScroll();
+  const isMobile = useThree((state) => state.size.width <= 640);
   const setSection = useStore(state => state.setSection);
   const expandedProject = useStore(state => state.expandedProject);
   const projects = useStore(state => state.projects);
@@ -92,8 +93,9 @@ export const CameraHandler: React.FC = () => {
     else if (r < 0.6) {
         const t = (r - 0.4) / 0.2; 
         const angle = t * Math.PI * 2;
-        const radius = 6;
-        targetPos.set(Math.sin(angle) * radius, 2, Math.cos(angle) * radius);
+        const radius = isMobile ? 8.2 : 6;
+        const y = isMobile ? 2.6 : 2;
+        targetPos.set(Math.sin(angle) * radius, y, Math.cos(angle) * radius);
         targetLookAt.set(0, 0, 0);
     }
     

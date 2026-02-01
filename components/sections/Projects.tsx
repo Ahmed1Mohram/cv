@@ -85,7 +85,7 @@ export const ProjectsSection: React.FC = () => {
     const end = 2/5;
     const dt = Math.min(delta, 1 / 30);
 
-    const offsetLambda = isMobile ? 4.5 : 7;
+    const offsetLambda = isMobile ? 8 : 7;
     const rawOffset = scroll.offset;
     if (smoothOffsetRef.current === 0 && rawOffset !== 0) {
       smoothOffsetRef.current = rawOffset;
@@ -133,7 +133,7 @@ export const ProjectsSection: React.FC = () => {
       }
     }
 
-    const progressLambda = isMobile ? 1.6 : 3;
+    const progressLambda = isMobile ? 3.2 : 3;
     const p = THREE.MathUtils.damp(smoothProgressRef.current, rawP, progressLambda, dt);
     smoothProgressRef.current = p;
     progressRef.current = p;

@@ -37,9 +37,9 @@ export const Experience: React.FC = () => {
     if (typeof window === 'undefined') return false;
     return window.matchMedia('(max-width: 640px)').matches;
   }, []);
-  const scrollDistance = isMobile ? 4.2 : 2.2;
-  const scrollDamping = isMobile ? 0.14 : 0.09;
-  const dprMin = isMobile ? 1.15 : 1;
+  const scrollDistance = isMobile ? 2.9 : 2.2;
+  const scrollDamping = isMobile ? 0.18 : 0.09;
+  const dprMin = isMobile ? 1.2 : 1;
   const webglAvailable = React.useMemo(() => {
     if (typeof document === 'undefined') return true;
     const c = document.createElement('canvas');
@@ -61,7 +61,7 @@ export const Experience: React.FC = () => {
         powerPreference: isMobile ? "high-performance" : "low-power",
         alpha: false
       }}
-      dpr={[dprMin, expandedProject !== null ? (isMobile ? 1.7 : 1.75) : (isMobile ? 1.45 : 1.35)]}
+      dpr={[dprMin, expandedProject !== null ? (isMobile ? 1.9 : 1.75) : (isMobile ? 1.75 : 1.35)]}
       onCreated={({ gl }) => {
         const c = gl.domElement;
         const onLost = (e: Event) => {

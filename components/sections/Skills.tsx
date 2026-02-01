@@ -1,10 +1,11 @@
 import React, { useMemo, useRef } from 'react';
-import { useFrame } from '@react-three/fiber';
+import { useFrame, useThree } from '@react-three/fiber';
 import { Billboard, useScroll, Sphere, Text } from '@react-three/drei';
 import * as THREE from 'three';
 
 export const SkillsSection: React.FC = () => {
   const scroll = useScroll();
+  const isMobile = useThree((state) => state.size.width <= 640);
   const groupRef = useRef<THREE.Group>(null);
   const sunRef = useRef<THREE.Group>(null);
   const visibleRef = useRef(false);
@@ -42,12 +43,12 @@ export const SkillsSection: React.FC = () => {
       <Galaxies enabledRef={visibleRef} />
 
       {/* THE SUN */}
-      <group ref={sunRef}>
+      <group ref={sunRef} scale={isMobile ? 0.78 : 1}>
           <Sphere args={[1.5, 64, 64]}>
             <meshStandardMaterial
               color="#ffdfb0"
               emissive="#ffb44d"
-              emissiveIntensity={2.4}
+              emissiveIntensity={isMobile ? 1.65 : 2.4}
               roughness={0.95}
               metalness={0}
               toneMapped={false}
@@ -57,7 +58,7 @@ export const SkillsSection: React.FC = () => {
             <meshStandardMaterial
               color="#fff0d4"
               emissive="#ffd39a"
-              emissiveIntensity={2.1}
+              emissiveIntensity={isMobile ? 1.35 : 2.1}
               roughness={0.7}
               metalness={0}
               transparent
@@ -69,7 +70,7 @@ export const SkillsSection: React.FC = () => {
             <meshBasicMaterial
               color="#ff7a18"
               transparent
-              opacity={0.12}
+              opacity={isMobile ? 0.07 : 0.12}
               blending={THREE.AdditiveBlending}
               depthWrite={false}
               side={THREE.BackSide}
@@ -79,8 +80,8 @@ export const SkillsSection: React.FC = () => {
           
           <pointLight 
             color="#ffeedd" 
-            intensity={3.5} 
-            distance={50} 
+            intensity={isMobile ? 2.2 : 3.5} 
+            distance={isMobile ? 34 : 50} 
             decay={1} 
           />
       </group>
