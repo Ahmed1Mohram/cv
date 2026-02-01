@@ -125,7 +125,8 @@ export const Overlay: React.FC = () => {
                     style={{ bottom: 'calc(env(safe-area-inset-bottom) + 6rem)' }}
                     dir="rtl"
                 >
-                    <div className="flex w-full flex-wrap items-center gap-3 sm:gap-4 justify-center">
+                    <div className="flex w-full flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
+                        <div className="flex items-center justify-center gap-3 sm:gap-4">
                         <a
                             href={whatsappUrl}
                             target="_blank"
@@ -150,11 +151,12 @@ export const Overlay: React.FC = () => {
                             <span className="pointer-events-none absolute inset-0 rounded-full opacity-60 transition-opacity duration-300 group-hover:opacity-100" style={{ background: 'radial-gradient(circle at 30% 30%, rgba(125,211,252,0.16), transparent 55%), radial-gradient(circle at 70% 80%, rgba(167,139,250,0.12), transparent 60%)' }} />
                             <FacebookIcon className={spaceIconClass} />
                         </a>
+                        </div>
                         <a
                             href={whatsappUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className={`${spaceNumberClass} relative overflow-hidden basis-full sm:basis-auto text-center`}
+                            className={`${spaceNumberClass} relative overflow-hidden w-full max-w-[320px] sm:w-auto text-center`}
                             aria-label={whatsappNumber}
                             title={whatsappNumber}
                         >
@@ -172,13 +174,13 @@ export const Overlay: React.FC = () => {
             initial={{ opacity: 0, y: -6 }}
             animate={{ opacity: [0.55, 0.95, 0.55], y: [0, 8, 0] }}
             transition={{ duration: 1.7, repeat: Infinity, ease: 'easeInOut' }}
-            className="absolute left-1/2 -translate-x-1/2 pointer-events-none sm:bottom-10"
+            className="absolute inset-x-0 pointer-events-none flex justify-center sm:bottom-10"
             style={isMobile ? { bottom: 'calc(env(safe-area-inset-bottom) + 12rem)' } : undefined}
             aria-hidden="true"
           >
             <div className="flex flex-col items-center gap-2">
               <div className="text-[10px] sm:text-xs font-semibold tracking-widest text-white/70">
-                Scroll Down
+         Scroll Down
               </div>
               <div className="group relative w-12 h-12 sm:w-14 sm:h-14 rounded-full overflow-hidden bg-white/5 backdrop-blur-md border border-white/15 shadow-[0_0_0_1px_rgba(255,255,255,0.06),0_18px_70px_rgba(0,0,0,0.65)] flex items-center justify-center">
                 <span
@@ -190,7 +192,8 @@ export const Overlay: React.FC = () => {
                   style={{ background: 'radial-gradient(circle at 30% 30%, rgba(125,211,252,0.12), transparent 55%), radial-gradient(circle at 70% 80%, rgba(167,139,250,0.1), transparent 60%)' }}
                 />
                 <svg viewBox="0 0 24 24" fill="none" className="relative w-6 h-6 sm:w-7 sm:h-7 text-white/90 drop-shadow-[0_0_16px_rgba(147,197,253,0.25)]">
-                  <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                  <path d="M6.5 7.5l5.5 5.5 5.5-5.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" opacity="0.55" />
+                  <path d="M6.5 11l5.5 5.5 5.5-5.5" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               </div>
             </div>
