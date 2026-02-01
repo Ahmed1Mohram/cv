@@ -172,7 +172,7 @@ export const Overlay: React.FC = () => {
           >
             <div className="flex flex-col items-center gap-2">
               <div className="text-[10px] sm:text-xs font-semibold tracking-widest text-white/70">
-                اسكرول داون
+         Scroll Down
               </div>
               <div className="group relative w-12 h-12 sm:w-14 sm:h-14 rounded-full overflow-hidden bg-white/5 backdrop-blur-md border border-white/15 shadow-[0_0_0_1px_rgba(255,255,255,0.06),0_18px_70px_rgba(0,0,0,0.65)] flex items-center justify-center">
                 <span
