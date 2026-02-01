@@ -1,10 +1,11 @@
 import React, { useRef } from 'react';
 import { useScroll, Text, Float } from '@react-three/drei';
-import { useFrame } from '@react-three/fiber';
+import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 
 export const ContactSection: React.FC = () => {
   const scroll = useScroll();
+  const isMobile = useThree((state) => state.size.width <= 640);
   const group = useRef<THREE.Group>(null);
   const arFont = "https://cdn.jsdelivr.net/npm/@openfonts/tajawal_arabic@1.44.1/files/tajawal-arabic-700.woff";
   const email = "ahmedmhram3@gmail.com";
@@ -24,12 +25,12 @@ export const ContactSection: React.FC = () => {
             {/* Arabic Text */}
             <Text
                 font={arFont}
-                fontSize={0.6}
-                maxWidth={8}
+                fontSize={isMobile ? 0.42 : 0.6}
+                maxWidth={isMobile ? 5.6 : 8}
                 lineHeight={1.5}
                 textAlign="center"
                 direction="rtl"
-                position={[0, 2.5, 0]}
+                position={[0, isMobile ? 2.1 : 2.5, 0]}
                 color="#ffffff"
                 anchorX="center"
                 anchorY="middle"
@@ -41,8 +42,8 @@ export const ContactSection: React.FC = () => {
             
              <Text
                 font={arFont}
-                fontSize={0.25}
-                position={[0, 1.5, 0]}
+                fontSize={isMobile ? 0.18 : 0.25}
+                position={[0, isMobile ? 1.3 : 1.5, 0]}
                 color="#88ccff"
                 anchorX="center"
                 anchorY="middle"
@@ -52,14 +53,14 @@ export const ContactSection: React.FC = () => {
             </Text>
 
             {/* Glowing Button Placeholder */}
-            <mesh position={[0, 0.5, 0]} onClick={() => window.location.href = `mailto:${email}`}>
-                <planeGeometry args={[3, 1]} />
+            <mesh position={[0, isMobile ? 0.45 : 0.5, 0]} onClick={() => window.location.href = `mailto:${email}`}>
+                <planeGeometry args={[isMobile ? 2.4 : 3, isMobile ? 0.85 : 1]} />
                 <meshBasicMaterial color="#4f46e5" transparent opacity={0.8} />
             </mesh>
             <Text
-                 position={[0, 0.5, 0.1]}
+                 position={[0, isMobile ? 0.45 : 0.5, 0.1]}
                  font={arFont}
-                 fontSize={0.3}
+                 fontSize={isMobile ? 0.22 : 0.3}
                  color="white"
                  anchorX="center"
                  anchorY="middle"

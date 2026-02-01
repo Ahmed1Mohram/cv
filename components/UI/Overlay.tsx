@@ -80,14 +80,14 @@ export const Overlay: React.FC = () => {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -20 }}
                     transition={{ duration: 0.8 }}
-                    className="text-center"
+                    className="text-center max-w-[92vw]"
                     dir="rtl"
                 >
-                    <h2 className="text-4xl sm:text-6xl lg:text-8xl leading-tight font-black bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-600">
+                    <h2 className="text-3xl sm:text-6xl lg:text-8xl leading-[1.15] font-black bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-600">
                         مرحبا بك ف عالم<br />
                         أحمد محرم
                     </h2>
-                    <div className="mt-5 text-lg sm:text-xl font-light text-white/70">
+                    <div className="mt-4 sm:mt-5 text-base sm:text-xl font-light text-white/70">
                         ببني تجارب رقمية غامرة
                     </div>
                 </motion.div>
@@ -99,11 +99,11 @@ export const Overlay: React.FC = () => {
                     initial={{ opacity: 0, x: -50 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: 50 }}
-                    className="absolute bottom-10 sm:bottom-20 right-4 sm:right-10 max-w-[92vw] text-right pointer-events-auto"
+                    className="absolute top-24 left-1/2 -translate-x-1/2 text-center sm:top-auto sm:left-auto sm:translate-x-0 sm:bottom-20 sm:right-10 sm:text-right max-w-[92vw] pointer-events-auto"
                     dir="rtl"
                 >
-                    <h2 className="text-3xl sm:text-5xl lg:text-6xl font-bold mb-3 sm:mb-4">أعمال مختارة</h2>
-                    <p className="max-w-xs sm:max-w-md text-xs sm:text-sm opacity-70 mb-4">
+                    <h2 className="text-2xl sm:text-5xl lg:text-6xl font-bold mb-2 sm:mb-4">أعمال مختارة</h2>
+                    <p className="max-w-xs sm:max-w-md text-[11px] sm:text-sm opacity-70 mb-3 sm:mb-4">
                         مجموعة من التجارب التقنية. <br/>
                         <span className="text-blue-400">اضغط على أي مشروع لعرض التفاصيل.</span>
                     </p>
@@ -116,10 +116,10 @@ export const Overlay: React.FC = () => {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -20 }}
-                    className="absolute bottom-16 sm:bottom-24 left-1/2 -translate-x-1/2 pointer-events-auto"
+                    className="absolute bottom-28 sm:bottom-24 left-1/2 -translate-x-1/2 pointer-events-auto max-w-[92vw]"
                     dir="rtl"
                 >
-                    <div className="flex items-center gap-4 justify-center">
+                    <div className="flex items-center gap-3 sm:gap-4 justify-center">
                         <a
                             href={whatsappUrl}
                             target="_blank"
@@ -180,7 +180,7 @@ export const Overlay: React.FC = () => {
       </div>
 
       {/* Footer / Progress */}
-      <footer className="w-full flex justify-between items-end">
+      <footer className="w-full hidden sm:flex justify-between items-end">
          <div className="flex flex-wrap gap-2 sm:gap-4">
              {['مقدمة', 'المشاريع', 'المهارات', 'نبذة', 'تواصل'].map((item, idx) => (
                  <div key={item} className={`text-[10px] sm:text-xs uppercase transition-colors duration-300 ${currentSection === idx ? 'text-white font-bold' : 'text-gray-600'}`}>
