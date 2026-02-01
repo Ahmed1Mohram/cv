@@ -26,9 +26,19 @@ export const Overlay: React.FC = () => {
     return window.matchMedia('(max-width: 640px)').matches;
   }, []);
 
+  const sectionLabel = React.useMemo(() => {
+    const labels = ['مقدمة', 'المشاريع', 'المهارات', 'نبذة', 'تواصل'];
+    return labels[currentSection] ?? '';
+  }, [currentSection]);
+
   const spaceIconButtonClass = "group relative w-11 h-11 sm:w-14 sm:h-14 rounded-full overflow-hidden bg-white/5 backdrop-blur-md border border-white/20 shadow-[0_0_0_1px_rgba(255,255,255,0.08),0_26px_90px_rgba(0,0,0,0.65)] flex items-center justify-center transition-all duration-300 ease-out hover:bg-white/10 hover:border-white/30 hover:shadow-[0_0_0_1px_rgba(147,197,253,0.32),0_0_40px_rgba(147,197,253,0.22),0_34px_110px_rgba(0,0,0,0.72)] hover:scale-[1.08] active:scale-[0.96] focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-300/70";
   const spaceIconClass = "w-5 h-5 sm:w-7 sm:h-7 text-white/95 drop-shadow-[0_0_14px_rgba(147,197,253,0.24)] transition-transform duration-300 ease-out group-hover:scale-110";
   const spaceNumberClass = "text-[11px] sm:text-sm font-semibold text-white/80 px-3 sm:px-4 py-2 rounded-full bg-white/5 backdrop-blur-md border border-white/15 shadow-[0_0_0_1px_rgba(255,255,255,0.06),0_18px_60px_rgba(0,0,0,0.55)] tracking-wider whitespace-nowrap";
+
+  const glassPillClass = "relative overflow-hidden rounded-full bg-white/[0.04] backdrop-blur-xl border border-white/15 shadow-[0_0_0_1px_rgba(255,255,255,0.06),0_22px_90px_rgba(0,0,0,0.62)]";
+  const glassCardClass = "relative overflow-hidden rounded-3xl bg-white/[0.035] backdrop-blur-xl border border-white/12 shadow-[0_0_0_1px_rgba(255,255,255,0.06),0_30px_120px_rgba(0,0,0,0.72)]";
+  const primaryButtonClass = "group relative overflow-hidden rounded-full px-5 sm:px-7 py-2.5 sm:py-3 font-bold text-sm sm:text-base text-slate-950 bg-gradient-to-r from-sky-300 via-blue-400 to-violet-400 shadow-[0_0_0_1px_rgba(255,255,255,0.2),0_18px_70px_rgba(56,189,248,0.24)] transition-all duration-300 hover:brightness-110 hover:shadow-[0_0_0_1px_rgba(255,255,255,0.26),0_0_40px_rgba(125,211,252,0.22),0_22px_80px_rgba(0,0,0,0.65)] active:scale-[0.98]";
+  const secondaryButtonClass = "group relative overflow-hidden rounded-full px-5 sm:px-7 py-2.5 sm:py-3 font-bold text-sm sm:text-base text-white bg-white/[0.04] border border-white/18 shadow-[0_0_0_1px_rgba(255,255,255,0.06),0_18px_70px_rgba(0,0,0,0.55)] transition-all duration-300 hover:bg-white/[0.07] hover:border-white/28 hover:shadow-[0_0_0_1px_rgba(147,197,253,0.2),0_0_40px_rgba(147,197,253,0.16),0_22px_80px_rgba(0,0,0,0.65)] active:scale-[0.98]";
 
   const whatsappNumber = '01005209667';
   const whatsappUrl = 'https://wa.me/201005209667';
@@ -69,9 +79,20 @@ export const Overlay: React.FC = () => {
     <main className={`absolute top-0 left-0 w-full h-full pointer-events-none z-10 flex flex-col justify-between p-4 sm:p-8 lg:p-12 text-white transition-opacity duration-500 ${expandedProject !== null ? 'opacity-0' : 'opacity-100'}`}>
       {/* Header */}
       <header className="flex justify-between items-center w-full">
-        <h1 className="text-lg sm:text-2xl font-bold tracking-tighter">معرض أعمال</h1>
-        <div className="hidden sm:block text-xs uppercase tracking-widest opacity-50">
-           اسحب للاكتشاف
+        <div className={`pointer-events-auto inline-flex items-center gap-3 px-4 py-2 ${glassPillClass}`}>
+          <span className="text-[12px] sm:text-sm font-extrabold tracking-tight text-white/95">معرض أعمال</span>
+          <span className="h-4 w-px bg-white/15" />
+          <span className="text-[10px] sm:text-[11px] font-semibold tracking-widest text-white/70">
+            {sectionLabel}
+          </span>
+          <span className="pointer-events-none absolute -inset-[2px] rounded-full opacity-70 blur-[0.5px]" style={{ background: 'radial-gradient(circle at 30% 30%, rgba(125,211,252,0.22), transparent 60%), radial-gradient(circle at 70% 80%, rgba(167,139,250,0.14), transparent 62%)' }} />
+        </div>
+
+        <div className={`hidden sm:block px-4 py-2 ${glassPillClass}`}>
+          <div className="text-[11px] uppercase tracking-[0.35em] text-white/55">
+            اسحب للاكتشاف
+          </div>
+          <span className="pointer-events-none absolute inset-0 opacity-70" style={{ background: 'linear-gradient(90deg, rgba(125,211,252,0.08), transparent 40%, rgba(167,139,250,0.08))' }} />
         </div>
       </header>
 
@@ -88,11 +109,20 @@ export const Overlay: React.FC = () => {
                     className="text-center max-w-[92vw]"
                     dir="rtl"
                 >
-                    <h2 className="text-3xl sm:text-6xl lg:text-8xl leading-[1.15] font-black bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-600">
+                    <div className={`mx-auto inline-flex items-center gap-2 px-4 py-2 ${glassPillClass}`}>
+                      <span className="text-[10px] sm:text-[11px] font-semibold tracking-[0.28em] text-white/70">React</span>
+                      <span className="h-3 w-px bg-white/15" />
+                      <span className="text-[10px] sm:text-[11px] font-semibold tracking-[0.28em] text-white/70">Next.js</span>
+                      <span className="h-3 w-px bg-white/15" />
+                      <span className="text-[10px] sm:text-[11px] font-semibold tracking-[0.28em] text-white/70">Three.js</span>
+                      <span className="pointer-events-none absolute inset-0 opacity-70" style={{ background: 'linear-gradient(90deg, rgba(125,211,252,0.10), transparent 42%, rgba(167,139,250,0.10))' }} />
+                    </div>
+
+                    <h2 className="mt-5 text-3xl sm:text-6xl lg:text-8xl leading-[1.12] font-black bg-clip-text text-transparent bg-gradient-to-r from-sky-300 via-blue-400 to-violet-400 drop-shadow-[0_0_40px_rgba(125,211,252,0.12)]">
                         مرحبا بك ف عالم<br />
                         أحمد محرم
                     </h2>
-                    <div className="mt-4 sm:mt-5 text-base sm:text-xl font-light text-white/70">
+                    <div className="mt-4 sm:mt-5 text-base sm:text-xl font-light text-white/75">
                         ببني تجارب رقمية غامرة
                     </div>
                 </motion.div>
@@ -107,11 +137,15 @@ export const Overlay: React.FC = () => {
                     className="absolute top-24 left-1/2 -translate-x-1/2 text-center sm:top-auto sm:left-auto sm:translate-x-0 sm:bottom-20 sm:right-10 sm:text-right max-w-[92vw] pointer-events-auto"
                     dir="rtl"
                 >
-                    <h2 className="text-2xl sm:text-5xl lg:text-6xl font-bold mb-2 sm:mb-4">أعمال مختارة</h2>
-                    <p className="max-w-xs sm:max-w-md text-[11px] sm:text-sm opacity-70 mb-3 sm:mb-4">
-                        مجموعة من التجارب التقنية. <br/>
-                        <span className="text-blue-400">اضغط على أي مشروع لعرض التفاصيل.</span>
-                    </p>
+                    <div className={`mx-auto sm:mx-0 px-5 py-4 sm:px-6 sm:py-5 ${glassCardClass}`}>
+                      <h2 className="text-2xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight mb-2 sm:mb-3">أعمال مختارة</h2>
+                      <p className="max-w-xs sm:max-w-md text-[11px] sm:text-sm text-white/65 mb-1">
+                          مجموعة من التجارب التقنية. <br/>
+                          <span className="text-sky-300">اضغط على أي مشروع لعرض التفاصيل.</span>
+                      </p>
+                      <span className="pointer-events-none absolute -inset-[2px] rounded-3xl opacity-70 blur-[0.5px]" style={{ background: 'radial-gradient(circle at 35% 25%, rgba(125,211,252,0.18), transparent 58%), radial-gradient(circle at 75% 80%, rgba(167,139,250,0.12), transparent 60%)' }} />
+                      <span className="pointer-events-none absolute inset-0 opacity-70" style={{ background: 'linear-gradient(90deg, rgba(125,211,252,0.06), transparent 45%, rgba(167,139,250,0.06))' }} />
+                    </div>
                 </motion.div>
             )}
 
@@ -205,8 +239,13 @@ export const Overlay: React.FC = () => {
       <footer className="w-full hidden sm:flex justify-between items-end">
          <div className="flex flex-wrap gap-2 sm:gap-4">
              {['مقدمة', 'المشاريع', 'المهارات', 'نبذة', 'تواصل'].map((item, idx) => (
-                 <div key={item} className={`text-[10px] sm:text-xs uppercase transition-colors duration-300 ${currentSection === idx ? 'text-white font-bold' : 'text-gray-600'}`}>
-                     0{idx+1} {item}
+                 <div
+                   key={item}
+                   className={`px-3 py-2 rounded-full border transition-all duration-300 ${currentSection === idx ? 'bg-white/[0.06] border-white/25 text-white shadow-[0_0_0_1px_rgba(255,255,255,0.08),0_18px_70px_rgba(0,0,0,0.55)]' : 'bg-transparent border-white/10 text-white/45'}`}
+                 >
+                   <span className="text-[10px] sm:text-xs uppercase tracking-widest">
+                     0{idx + 1} {item}
+                   </span>
                  </div>
              ))}
          </div>
@@ -221,18 +260,20 @@ export const Overlay: React.FC = () => {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ delay: 0.5, duration: 0.5 }} // Delay to let 3D animation finish
-                className="absolute top-0 left-0 w-full h-full z-20 flex bg-black/25 pointer-events-auto overflow-y-auto sm:overflow-hidden"
+                className="absolute top-0 left-0 w-full h-full z-20 flex bg-black/35 backdrop-blur-sm pointer-events-auto overflow-y-auto sm:overflow-hidden"
             >
                 {/* Content Container */}
                 <div className="container mx-auto flex min-h-full flex-col sm:flex-row items-stretch sm:items-center justify-between p-4 sm:p-12">
                     
                     {/* Left Side: Info */}
-                    <div className="w-full sm:w-1/2 flex flex-col items-end space-y-6 sm:space-y-8 pr-0 sm:pr-12 text-right bg-black/30 p-4 sm:p-8 mt-16 sm:mt-0" dir="rtl">
+                    <div className={`w-full sm:w-1/2 flex flex-col items-end space-y-6 sm:space-y-8 pr-0 sm:pr-12 text-right mt-16 sm:mt-0 p-5 sm:p-9 ${glassCardClass}`} dir="rtl">
+                         <span className="pointer-events-none absolute -inset-[2px] rounded-3xl opacity-70 blur-[0.5px]" style={{ background: 'radial-gradient(circle at 35% 25%, rgba(125,211,252,0.18), transparent 58%), radial-gradient(circle at 75% 80%, rgba(167,139,250,0.12), transparent 60%)' }} />
+                         <span className="pointer-events-none absolute inset-0 opacity-70" style={{ background: 'linear-gradient(120deg, rgba(125,211,252,0.06), transparent 55%, rgba(167,139,250,0.07))' }} />
                          <motion.h2 
                             initial={{ y: 50, opacity: 0 }}
                             animate={{ y: 0, opacity: 1 }}
                             transition={{ delay: 0.7 }}
-                            className="text-3xl sm:text-5xl lg:text-7xl font-black text-white"
+                            className="relative text-3xl sm:text-5xl lg:text-7xl font-black tracking-tight text-white"
                          >
                             {activeInfo.title}
                          </motion.h2>
@@ -244,20 +285,21 @@ export const Overlay: React.FC = () => {
                          >
                              <div className="flex flex-wrap gap-4 mb-6 justify-end">
                                 {activeInfo.stack.map(tech => (
-                                    <span key={tech} className="px-3 py-1 border border-white/20 rounded-full text-xs uppercase tracking-wider">
+                                    <span key={tech} className="relative overflow-hidden px-3 py-1.5 border border-white/18 rounded-full text-[11px] uppercase tracking-widest text-white/80 bg-white/[0.03]">
+                                        <span className="pointer-events-none absolute inset-0 opacity-70" style={{ background: 'linear-gradient(90deg, rgba(125,211,252,0.08), transparent 55%, rgba(167,139,250,0.08))' }} />
                                         {tech}
                                     </span>
                                 ))}
                              </div>
-                             <p className="text-base sm:text-lg lg:text-xl text-gray-300 max-w-lg leading-relaxed">
+                             <p className="text-base sm:text-lg lg:text-xl text-white/75 max-w-lg leading-relaxed">
                                 {activeInfo.desc}
                              </p>
                              {activeInfo.details && (
-                               <p className="mt-4 text-gray-300 max-w-lg leading-relaxed">
+                               <p className="mt-4 text-white/70 max-w-lg leading-relaxed">
                                   {activeInfo.details}
                                </p>
                              )}
-                             <p className="mt-4 text-gray-400 text-sm max-w-lg">
+                             <p className="mt-4 text-white/55 text-sm max-w-lg">
                                 لو تحب نسخة مشابهة لمشروعك مع تصميم مخصص وأداء عالي على الموبايل والكمبيوتر، ابعتلي تفاصيل فكرتك.
                              </p>
                          </motion.div>
@@ -270,16 +312,18 @@ export const Overlay: React.FC = () => {
                             <div className="flex gap-4 justify-end">
                                 <button
                                   onClick={() => activeInfo?.liveUrl && window.open(activeInfo.liveUrl, '_blank', 'noopener,noreferrer')}
-                                  className="bg-white text-black px-5 sm:px-8 py-2.5 sm:py-3 font-bold text-base sm:text-lg hover:bg-gray-200 transition-colors rounded-none"
+                                  className={primaryButtonClass}
                                 >
-                                    عرض مباشر
+                                    <span className="pointer-events-none absolute inset-0 opacity-70" style={{ background: 'radial-gradient(circle at 30% 30%, rgba(255,255,255,0.28), transparent 55%), radial-gradient(circle at 70% 80%, rgba(255,255,255,0.12), transparent 60%)' }} />
+                                    <span className="relative">عرض مباشر</span>
                                 </button>
                                 {activeInfo?.githubUrl && (
                                   <button
                                     onClick={() => window.open(activeInfo.githubUrl, '_blank', 'noopener,noreferrer')}
-                                    className="border border-white text-white px-5 sm:px-8 py-2.5 sm:py-3 font-bold text-base sm:text-lg hover:bg-white/10 transition-colors rounded-none"
+                                    className={secondaryButtonClass}
                                   >
-                                      جيتهاب
+                                      <span className="pointer-events-none absolute inset-0 opacity-70" style={{ background: 'linear-gradient(90deg, rgba(125,211,252,0.08), transparent 45%, rgba(167,139,250,0.08))' }} />
+                                      <span className="relative">جيتهاب</span>
                                   </button>
                                 )}
                             </div>
@@ -290,9 +334,11 @@ export const Overlay: React.FC = () => {
                     <div className="absolute top-4 sm:top-12 right-4 sm:right-12">
                         <button 
                             onClick={() => setExpandedProject(null)}
-                            className="text-white hover:text-red-500 transition-colors text-sm sm:text-xl font-bold uppercase tracking-widest flex items-center gap-2"
+                            className="group relative w-11 h-11 sm:w-14 sm:h-14 rounded-full overflow-hidden bg-white/[0.04] backdrop-blur-xl border border-white/15 shadow-[0_0_0_1px_rgba(255,255,255,0.06),0_22px_90px_rgba(0,0,0,0.65)] flex items-center justify-center transition-all duration-300 hover:bg-white/[0.07] hover:border-white/25 hover:shadow-[0_0_0_1px_rgba(147,197,253,0.18),0_0_40px_rgba(147,197,253,0.14),0_26px_110px_rgba(0,0,0,0.72)] active:scale-[0.98]"
+                            aria-label="إغلاق"
                         >
-                            <span>إغلاق</span>
+                            <span className="pointer-events-none absolute -inset-[2px] rounded-full opacity-70 blur-[0.5px]" style={{ background: 'radial-gradient(circle at 50% 50%, rgba(125,211,252,0.18), transparent 62%), radial-gradient(circle at 35% 30%, rgba(167,139,250,0.12), transparent 60%)' }} />
+                            <span className="pointer-events-none absolute inset-0 rounded-full opacity-60" style={{ background: 'radial-gradient(circle at 30% 30%, rgba(125,211,252,0.10), transparent 55%), radial-gradient(circle at 70% 80%, rgba(167,139,250,0.08), transparent 60%)' }} />
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 sm:w-8 sm:h-8">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                             </svg>

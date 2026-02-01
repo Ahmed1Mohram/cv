@@ -8,6 +8,8 @@ type QualityTier = 'low' | 'medium' | 'high';
 export const SkillsSection: React.FC<{ quality?: QualityTier }> = ({ quality = 'high' }) => {
   const scroll = useScroll();
   const isMobile = useThree((state) => state.size.width <= 640);
+  const shadowsEnabled = !isMobile && (quality === 'high' || quality === 'medium');
+  const shadowMapSize = quality === 'high' ? 512 : 256;
   const groupRef = useRef<THREE.Group>(null);
   const sunRef = useRef<THREE.Group>(null);
   const visibleRef = useRef(false);
@@ -16,26 +18,18 @@ export const SkillsSection: React.FC<{ quality?: QualityTier }> = ({ quality = '
   const sunGlowTexture = useMemo(() => {
       if (typeof document === 'undefined') return null;
       const canvas = document.createElement('canvas');
-      canvas.width = 256;
-      canvas.height = 256;
+      canvas.width = 128;
+      canvas.height = 128;
       const ctx = canvas.getContext('2d');
       if (!ctx) return null;
 
-      const cx = canvas.width / 2;
-      const cy = canvas.height / 2;
-      const r = canvas.width / 2;
-
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
-      g.addColorStop(0.0, 'rgba(255,255,255,1.0)');
-      g.addColorStop(0.08, 'rgba(255,244,220,0.98)');
-      g.addColorStop(0.22, 'rgba(255,196,120,0.65)');
-      g.addColorStop(0.48, 'rgba(255,128,36,0.24)');
-      g.addColorStop(1.0, 'rgba(255,90,10,0.0)');
-      ctx.fillStyle = g;
-      ctx.beginPath();
-      ctx.arc(cx, cy, r, 0, Math.PI * 2);
-      ctx.fill();
+      const gradient = ctx.createRadialGradient(64, 64, 0, 64, 64, 64);
+      gradient.addColorStop(0, 'rgba(255, 240, 200, 1)');
+      gradient.addColorStop(0.3, 'rgba(255, 140, 0, 0.6)');
+      gradient.addColorStop(0.6, 'rgba(255, 60, 0, 0.1)');
+      gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, 128, 128);
 
       const tex = new THREE.CanvasTexture(canvas);
       tex.colorSpace = THREE.SRGBColorSpace;
@@ -84,71 +78,13 @@ export const SkillsSection: React.FC<{ quality?: QualityTier }> = ({ quality = '
       <Galaxies enabledRef={visibleRef} quality={quality} />
 
       {/* THE SUN */}
-      <group ref={sunRef} scale={isMobile ? 0.78 : 1}>
-          <Sphere args={[1.5, 64, 64]}>
-            <meshStandardMaterial
-              color="#ffdfb0"
-              emissive="#ffb44d"
-              emissiveIntensity={isMobile ? 2.35 : 3.4}
-              roughness={0.95}
-              metalness={0}
-              toneMapped={false}
-            />
-          </Sphere>
-          <Sphere args={[1.42, 48, 48]}>
-            <meshStandardMaterial
-              color="#fff0d4"
-              emissive="#ffd39a"
-              emissiveIntensity={isMobile ? 1.95 : 3.0}
-              roughness={0.7}
-              metalness={0}
-              transparent
-              opacity={0.85}
-              toneMapped={false}
-            />
-          </Sphere>
-          <Sphere args={[1.72, 48, 48]}>
-            <meshBasicMaterial
-              color="#ff7a18"
-              transparent
-              opacity={isMobile ? 0.1 : 0.18}
-              blending={THREE.AdditiveBlending}
-              depthWrite={false}
-              side={THREE.BackSide}
-              toneMapped={false}
-            />
-          </Sphere>
-
-          <Sphere args={[2.25, 32, 32]}>
-            <meshBasicMaterial
-              color="#ffb14a"
-              transparent
-              opacity={isMobile ? 0.08 : 0.14}
-              blending={THREE.AdditiveBlending}
-              depthWrite={false}
-              side={THREE.BackSide}
-              toneMapped={false}
-            />
-          </Sphere>
-
-          {sunGlowTexture && (
-            <sprite scale={[isMobile ? 7.8 : 10.5, isMobile ? 7.8 : 10.5, 1]}>
-              <spriteMaterial
-                map={sunGlowTexture}
-                transparent
-                opacity={isMobile ? 0.55 : 0.7}
-                blending={THREE.AdditiveBlending}
-                depthWrite={false}
-                toneMapped={false}
-              />
-            </sprite>
-          )}
-          
-          <pointLight 
-            color="#ffeedd" 
-            intensity={isMobile ? 3.8 : 6.8} 
-            distance={isMobile ? 48 : 75} 
-            decay={2} 
+      <group ref={sunRef} scale={isMobile ? 0.74 : 0.92}>
+          <Sun
+            isMobile={isMobile}
+            quality={quality}
+            shadowsEnabled={shadowsEnabled}
+            shadowMapSize={shadowMapSize}
+            glowTexture={sunGlowTexture}
           />
       </group>
 
@@ -163,6 +99,9 @@ export const SkillsSection: React.FC<{ quality?: QualityTier }> = ({ quality = '
             index={i} 
             total={planets.length}
             meteorTarget={meteorTargetsRef.current[i]}
+            quality={quality}
+            shadowsEnabled={shadowsEnabled}
+            isMobile={isMobile}
          />
       ))}
 
@@ -170,6 +109,219 @@ export const SkillsSection: React.FC<{ quality?: QualityTier }> = ({ quality = '
       <Meteors enabledRef={visibleRef} targetsRef={meteorTargetsRef} quality={quality} />
     </group>
   );
+};
+
+const createSunSurfaceTexture = (seed: number) => {
+    if (typeof document === 'undefined') return null;
+    const canvas = document.createElement('canvas');
+    canvas.width = 256;
+    canvas.height = 128;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return null;
+
+    const rand = (x: number, y: number) => {
+        const v = Math.sin(x * 12.9898 + y * 78.233 + seed * 0.13) * 43758.5453;
+        return v - Math.floor(v);
+    };
+
+    const img = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const d = img.data;
+    for (let y = 0; y < canvas.height; y++) {
+        const v = y / (canvas.height - 1);
+        for (let x = 0; x < canvas.width; x++) {
+            const u = x / (canvas.width - 1);
+            const i = (y * canvas.width + x) * 4;
+
+            const n = (rand(x, y) * 2 - 1) * 0.25;
+            const bands = Math.sin((v * 10 + u * 2 + seed * 0.02) * Math.PI) * 0.12;
+            const cells = Math.sin((u * 30 + seed * 0.03)) * Math.sin((v * 18 + seed * 0.01)) * 0.08;
+            let m = 1.0 + n + bands + cells;
+            m = THREE.MathUtils.clamp(m, 0.6, 1.35);
+
+            const base = new THREE.Color('#ffcc7a');
+            const hot = new THREE.Color('#ff6a00');
+            const t = THREE.MathUtils.clamp(0.35 + (m - 1.0) * 1.3, 0, 1);
+            const c = base.clone().lerp(hot, t);
+
+            d[i + 0] = Math.round(c.r * 255);
+            d[i + 1] = Math.round(c.g * 255);
+            d[i + 2] = Math.round(c.b * 255);
+            d[i + 3] = 255;
+        }
+    }
+    ctx.putImageData(img, 0, 0);
+
+    const tex = new THREE.CanvasTexture(canvas);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    tex.wrapS = THREE.RepeatWrapping;
+    tex.wrapT = THREE.ClampToEdgeWrapping;
+    tex.repeat.set(1, 1);
+    tex.minFilter = THREE.LinearFilter;
+    tex.magFilter = THREE.LinearFilter;
+    tex.needsUpdate = true;
+    return tex;
+};
+
+const Sun: React.FC<{
+    isMobile: boolean;
+    quality: QualityTier;
+    shadowsEnabled: boolean;
+    shadowMapSize: number;
+    glowTexture: THREE.Texture | null;
+}> = ({ isMobile, quality, shadowsEnabled, shadowMapSize, glowTexture }) => {
+    const meshRef = useRef<THREE.Mesh>(null);
+    const sunTexture = useMemo(() => createSunSurfaceTexture(1337), []);
+
+    useFrame(() => {
+        if (meshRef.current) {
+            meshRef.current.rotation.y += 0.001;
+        }
+    });
+
+    const sunRadius = 1.35;
+    const lightIntensity = isMobile ? 5.0 : (quality === 'high' ? 11.0 : 8.8);
+    const lightDistance = isMobile ? 22 : 30;
+    const glowScale = sunRadius * (isMobile ? 5.4 : 6.2);
+
+    return (
+        <group>
+            <mesh ref={meshRef}>
+                <sphereGeometry args={[sunRadius, 64, 64]} />
+                <meshBasicMaterial map={sunTexture ?? undefined} color="#ffb000" toneMapped={false} />
+            </mesh>
+
+            {glowTexture && (
+                <sprite scale={[glowScale, glowScale, 1]}>
+                    <spriteMaterial
+                        map={glowTexture}
+                        transparent
+                        opacity={0.55}
+                        blending={THREE.AdditiveBlending}
+                        depthWrite={false}
+                        toneMapped={false}
+                    />
+                </sprite>
+            )}
+
+            <pointLight
+                intensity={lightIntensity}
+                decay={2}
+                distance={lightDistance}
+                color="#ffb000"
+                castShadow={shadowsEnabled}
+                shadow-mapSize={[shadowMapSize, shadowMapSize]}
+                shadow-bias={-0.0005}
+                shadow-camera-near={0.5}
+                shadow-camera-far={40}
+            />
+
+            <pointLight intensity={isMobile ? 0.08 : 0.12} decay={2} distance={10} color="#ff4400" />
+        </group>
+    );
+};
+
+const makePlanetTexture = (params: { type: string; color: string; seed: number; lowDetail: boolean }) => {
+    if (typeof document === 'undefined') return null;
+    const w = params.lowDetail ? 128 : 256;
+    const h = params.lowDetail ? 64 : 128;
+    const canvas = document.createElement('canvas');
+    canvas.width = w;
+    canvas.height = h;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return null;
+
+    const base = new THREE.Color(params.color);
+    const br = Math.round(base.r * 255);
+    const bg = Math.round(base.g * 255);
+    const bb = Math.round(base.b * 255);
+    ctx.fillStyle = `rgb(${br},${bg},${bb})`;
+    ctx.fillRect(0, 0, w, h);
+
+    const rand = (x: number, y: number) => {
+        const v = Math.sin(x * 12.9898 + y * 78.233 + params.seed * 0.13) * 43758.5453;
+        return v - Math.floor(v);
+    };
+
+    const img = ctx.getImageData(0, 0, w, h);
+    const d = img.data;
+    for (let y = 0; y < h; y++) {
+        const v = y / (h - 1);
+        for (let x = 0; x < w; x++) {
+            const u = x / (w - 1);
+            const i = (y * w + x) * 4;
+
+            const n = (rand(x, y) * 2 - 1) * 0.18;
+            let m = 1;
+            if (params.type === 'gas') {
+                const bands = 8;
+                const b = Math.sin(v * Math.PI * bands + params.seed * 0.2) * 0.18;
+                const swirl = Math.sin((u + v) * Math.PI * 2 + params.seed * 0.12) * 0.05;
+                m = 0.9 + b + swirl + n;
+            } else if (params.type === 'ice') {
+                const marb = Math.sin((u * 10 + v * 7) + params.seed * 0.1) * 0.12;
+                m = 0.86 + marb + n;
+            } else {
+                const grit = (rand(x * 2, y * 2) * 2 - 1) * 0.22;
+                const crater = Math.sin(u * 16 + params.seed * 0.3) * Math.sin(v * 11 + params.seed * 0.17) * 0.12;
+                m = 0.78 + grit + crater + n;
+            }
+
+            m = THREE.MathUtils.clamp(m, 0.55, 1.12);
+            d[i + 0] = THREE.MathUtils.clamp(br * m, 0, 255);
+            d[i + 1] = THREE.MathUtils.clamp(bg * m, 0, 255);
+            d[i + 2] = THREE.MathUtils.clamp(bb * m, 0, 255);
+            d[i + 3] = 255;
+        }
+    }
+    ctx.putImageData(img, 0, 0);
+
+    const tex = new THREE.CanvasTexture(canvas);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    tex.wrapS = THREE.RepeatWrapping;
+    tex.wrapT = THREE.ClampToEdgeWrapping;
+    tex.repeat.set(1, 1);
+    tex.needsUpdate = true;
+    return tex;
+};
+
+const makeFresnelAtmosphereMaterial = (color: string) => {
+    const c = new THREE.Color(color);
+    const material = new THREE.ShaderMaterial({
+        uniforms: {
+            uColor: { value: new THREE.Vector3(c.r, c.g, c.b) },
+            uBias: { value: 0.02 },
+            uScale: { value: 1.0 },
+            uPower: { value: 3.5 },
+        },
+        vertexShader: `
+            varying vec3 vNormal;
+            varying vec3 vViewDir;
+            void main() {
+                vNormal = normalize(normalMatrix * normal);
+                vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+                vViewDir = normalize(-mvPosition.xyz);
+                gl_Position = projectionMatrix * mvPosition;
+            }
+        `,
+        fragmentShader: `
+            uniform vec3 uColor;
+            uniform float uBias;
+            uniform float uScale;
+            uniform float uPower;
+            varying vec3 vNormal;
+            varying vec3 vViewDir;
+            void main() {
+                float fres = pow(1.0 - max(dot(vNormal, vViewDir), 0.0), uPower);
+                float a = clamp(uBias + uScale * fres, 0.0, 1.0);
+                gl_FragColor = vec4(uColor, a);
+            }
+        `,
+        transparent: true,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
+        side: THREE.BackSide,
+    });
+    return material;
 };
 
 const Orbit: React.FC<{ radius: number }> = ({ radius }) => {
@@ -447,6 +599,7 @@ const Meteors: React.FC<{ enabledRef: React.MutableRefObject<boolean>; targetsRe
     const trailMesh = useRef<THREE.InstancedMesh>(null);
     const headMesh = useRef<THREE.InstancedMesh>(null);
     const impactMesh = useRef<THREE.InstancedMesh>(null);
+    const wasEnabledRef = useRef(false);
     const isMobile = useThree((state) => state.size.width <= 640);
     const tmpPos = useRef(new THREE.Vector3());
     const tmpVel = useRef(new THREE.Vector3());
@@ -526,7 +679,8 @@ const Meteors: React.FC<{ enabledRef: React.MutableRefObject<boolean>; targetsRe
 
     const meteors = useMemo(() => {
         const base = isMobile ? 5 : 8;
-        const count = quality === 'high' ? base : quality === 'medium' ? Math.max(3, Math.round(base * 0.75)) : Math.max(2, Math.round(base * 0.5));
+        const minLow = isMobile ? 3 : 4;
+        const count = quality === 'high' ? base : quality === 'medium' ? Math.max(3, Math.round(base * 0.75)) : Math.max(minLow, Math.round(base * 0.5));
         const arr: Array<{ pos: THREE.Vector3; vel: THREE.Vector3; targetRef: { pos: THREE.Vector3; radius: number } | null; target: THREE.Vector3; hitR: number; len: number; width: number; rotY: number; cooldown: number; age: number; ttl: number; fast: boolean; warm: boolean; impactAge: number; impactTtl: number; impactPos: THREE.Vector3 }> = [];
         for (let i = 0; i < count; i++) {
             const fast = Math.random() < 0.38;
@@ -540,7 +694,7 @@ const Meteors: React.FC<{ enabledRef: React.MutableRefObject<boolean>; targetsRe
                 len: fast ? THREE.MathUtils.lerp(1.6, 2.8, Math.random()) : THREE.MathUtils.lerp(0.9, 1.7, Math.random()),
                 width: fast ? THREE.MathUtils.lerp(0.05, 0.085, Math.random()) : THREE.MathUtils.lerp(0.03, 0.06, Math.random()),
                 rotY: THREE.MathUtils.lerp(-0.8, 0.8, Math.random()),
-                cooldown: Math.random() * 2.5,
+                cooldown: i === 0 ? 0 : (0.12 + Math.random() * 0.95),
                 age: 0,
                 ttl: fast ? THREE.MathUtils.lerp(0.55, 1.05, Math.random()) : THREE.MathUtils.lerp(1.2, 2.4, Math.random()),
                 fast,
@@ -616,7 +770,20 @@ const Meteors: React.FC<{ enabledRef: React.MutableRefObject<boolean>; targetsRe
 
     useFrame((state, delta) => {
         if (!trailMesh.current || !headMesh.current || !impactMesh.current) return;
-        if (!enabledRef.current) return;
+        if (!enabledRef.current) {
+            wasEnabledRef.current = false;
+            return;
+        }
+
+        if (!wasEnabledRef.current) {
+            wasEnabledRef.current = true;
+            for (let i = 0; i < meteors.length; i++) {
+                const m = meteors[i];
+                m.cooldown = 0;
+                m.pos.set(0, 999, 0);
+                m.impactAge = 999;
+            }
+        }
 
         const dt = Math.min(delta, 1 / 30);
 
@@ -818,11 +985,23 @@ const Meteors: React.FC<{ enabledRef: React.MutableRefObject<boolean>; targetsRe
     );
 };
 
-const Planet = ({ name, color, type, size, distance, speed, index, total, meteorTarget }: any) => {
+const Planet = ({ name, color, type, size, distance, speed, index, total, meteorTarget, quality, shadowsEnabled, isMobile }: any) => {
     const planetRef = useRef<THREE.Group>(null);
     const meshRef = useRef<THREE.Mesh>(null);
     const denom = (typeof total === 'number' && total > 0) ? total : 9;
     const initialAngle = (index / denom) * Math.PI * 2;
+
+    const lowDetail = quality === 'low' || !!isMobile;
+    const baseColor = useMemo(() => {
+        const c = new THREE.Color(color);
+        const hsl = { h: 0, s: 0, l: 0 };
+        c.getHSL(hsl);
+        c.setHSL(hsl.h, hsl.s * 0.55, THREE.MathUtils.clamp(hsl.l * 0.9 + 0.06, 0, 1));
+        return `#${c.getHexString()}`;
+    }, [color]);
+
+    const albedo = useMemo(() => makePlanetTexture({ type, color: baseColor, seed: (index + 1) * 97, lowDetail }), [type, baseColor, index, lowDetail]);
+    const atmosphereMat = useMemo(() => makeFresnelAtmosphereMaterial(baseColor), [baseColor]);
 
     useFrame((state) => {
         if (planetRef.current) {
@@ -842,46 +1021,46 @@ const Planet = ({ name, color, type, size, distance, speed, index, total, meteor
     // Procedural Materials
     let material;
     if (type === "gas") {
-        material = <meshPhysicalMaterial 
-            color={color} 
-            roughness={0.4} 
-            metalness={0.1} 
-            clearcoat={0.5} 
-            clearcoatRoughness={0.5}
+        material = <meshStandardMaterial
+            color={baseColor}
+            roughness={0.55}
+            metalness={0.05}
+            map={albedo ?? undefined}
         />;
     } else if (type === "ice") {
-        material = <meshPhysicalMaterial 
-            color={color} 
-            roughness={0.1} 
-            metalness={0.8} 
-            transmission={0.2} 
-            thickness={1}
+        material = <meshStandardMaterial
+            color={baseColor}
+            roughness={0.25}
+            metalness={0.02}
+            map={albedo ?? undefined}
         />;
     } else if (type === "terrestrial") {
         material = <meshStandardMaterial 
-            color={color} 
-            roughness={0.8} 
-            metalness={0.1} 
+            color={baseColor} 
+            roughness={0.85} 
+            metalness={0.05} 
+            map={albedo ?? undefined}
         />;
     } else {
         material = <meshStandardMaterial 
-            color={color} 
-            roughness={0.9} 
-            metalness={0.2} 
-            flatShading 
+            color={baseColor} 
+            roughness={0.95} 
+            metalness={0.03} 
+            map={albedo ?? undefined}
         />;
     }
 
+    const seg = lowDetail ? 16 : (quality === 'high' ? 28 : 22);
+
     return (
         <group ref={planetRef}>
-            <mesh ref={meshRef}>
-                <sphereGeometry args={[size, 24, 24]} />
+            <mesh ref={meshRef} castShadow={!!shadowsEnabled} receiveShadow={!!shadowsEnabled}>
+                <sphereGeometry args={[size, seg, seg]} />
                 {material}
             </mesh>
 
-            <mesh>
-                <sphereGeometry args={[size * 1.12, 18, 18]} />
-                <meshBasicMaterial color={color} transparent opacity={0.08} blending={THREE.AdditiveBlending} depthWrite={false} toneMapped={false} />
+            <mesh material={atmosphereMat}>
+                <sphereGeometry args={[size * 1.06, lowDetail ? 14 : 18, lowDetail ? 14 : 18]} />
             </mesh>
 
             <Billboard position={[0, size + 0.3, 0]} follow lockZ>

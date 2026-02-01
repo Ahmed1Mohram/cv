@@ -41,7 +41,9 @@ export const ProjectsSection: React.FC = () => {
 
   const projects = ((projectsFromStore && projectsFromStore.length > 0) ? projectsFromStore : fallbackProjects).map((p: any, idx: number, arr: any[]) => {
       const liveUrl = (p?.liveUrl ?? p?.live_url ?? '') as string;
-      const localScreenshotUrl = (p?.imageUrl ?? p?.image_url ?? p?.localScreenshotUrl ?? '') as string;
+      const pid = Number(p?.id);
+      const fallbackLocal = fallbackProjects.find(fp => fp.id === pid)?.localScreenshotUrl ?? '';
+      const localScreenshotUrl = (p?.imageUrl ?? p?.image_url ?? p?.localScreenshotUrl ?? fallbackLocal ?? '') as string;
       const x = (idx - (arr.length - 1) / 2) * spacing;
       return {
           id: Number(p.id),
@@ -50,6 +52,7 @@ export const ProjectsSection: React.FC = () => {
           subtitle: (p?.subtitle ?? '') as string,
           liveUrl,
           localScreenshotUrl,
+          fallbackScreenshotUrl: fallbackLocal,
       };
   });
 
@@ -193,7 +196,7 @@ export const ProjectsSection: React.FC = () => {
 };
 
 interface ProjectItemProps {
-    proj: { id: number; x: number; title: string; subtitle: string; liveUrl: string; localScreenshotUrl: string };
+    proj: { id: number; x: number; title: string; subtitle: string; liveUrl: string; localScreenshotUrl: string; fallbackScreenshotUrl: string };
     index: number;
     activeIndex: number;
     prefetchAll: boolean;
@@ -213,6 +216,7 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
 }) => {
     const group = useRef<THREE.Group>(null);
     const gl = useThree(state => state.gl);
+    const isMobile = useThree((state) => state.size.width <= 640);
     const targetPos = useRef(new THREE.Vector3());
     const targetScale = useRef(new THREE.Vector3(1, 1, 1));
     const targetRot = useRef(new THREE.Euler(0, 0, 0));
@@ -250,7 +254,10 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
             return;
         }
 
-        if (!shouldLoad && !inFlightRef.current) {
+        if (!shouldLoad) {
+            if (controllerRef.current) controllerRef.current.abort();
+            inFlightRef.current = false;
+            inFlightTierRef.current = null;
             return;
         }
 
@@ -276,17 +283,23 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
         };
 
         const local = withBase(proj.localScreenshotUrl);
+        const fallbackLocal = withBase(proj.fallbackScreenshotUrl);
         const candidates = [
             local,
             local.replace(/\.jpg$/i, '.png'),
             local.replace(/\.png$/i, '.jpg'),
+            local.replace(/\.jpeg$/i, '.jpg'),
+            local.replace(/\.jpg$/i, '.jpeg'),
+            fallbackLocal,
+            fallbackLocal.replace(/\.jpg$/i, '.png'),
+            fallbackLocal.replace(/\.png$/i, '.jpg'),
         ].filter((v, i, a) => !!v && a.indexOf(v) === i);
 
         const prev = textureRef.current;
 
         const loadResizedTexture = async (url: string) => {
             const abs = new URL(url, window.location.href).toString();
-            const res = await fetch(abs, { mode: 'cors', signal: controllerRef.current?.signal, cache: 'no-store' });
+            const res = await fetch(abs, { mode: 'cors', signal: controllerRef.current?.signal, cache: 'force-cache' });
             if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
             const ct = (res.headers.get('content-type') || '').toLowerCase();
@@ -301,14 +314,16 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
 
             const maxTex = gl?.capabilities?.maxTextureSize || 4096;
             const requestedW = isExpanded
-              ? (isVeryLarge ? 2560 : (isLarge ? 3072 : 2560))
-              : (isNear ? (isVeryLarge ? 1600 : 2048) : (isLarge ? 1024 : 1400));
+              ? (isMobile ? 1920 : (isVeryLarge ? 2200 : (isLarge ? 2560 : 2200)))
+              : (isNear
+                  ? (isMobile ? 1280 : (isVeryLarge ? 1400 : 1600))
+                  : (isMobile ? 768 : (isLarge ? 768 : 900)));
 
             const w = Math.min(requestedW, maxTex);
             const h = Math.round(w * (9 / 16));
             let bmp: ImageBitmap | null = null;
             try {
-                bmp = await createImageBitmap(blob, { resizeWidth: w, resizeHeight: h, resizeQuality: 'high' } as any);
+                bmp = await createImageBitmap(blob, { resizeWidth: w, resizeHeight: h, resizeQuality: nearOrExpanded ? 'high' : 'medium' } as any);
             } catch {
                 try {
                     bmp = await createImageBitmap(blob);
@@ -391,7 +406,13 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
                     }
                     return;
                 } catch (e) {
-                    if ((e as any)?.name === 'AbortError') return;
+                    if ((e as any)?.name === 'AbortError') {
+                        if (requestId === requestIdRef.current) {
+                            inFlightRef.current = false;
+                            inFlightTierRef.current = null;
+                        }
+                        return;
+                    }
                     console.warn('[Projects] Failed to load screenshot texture:', c, e);
                 }
             }
@@ -406,7 +427,7 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
         };
 
         run();
-    }, [proj.localScreenshotUrl, shouldLoad, isNear, isExpanded]);
+    }, [proj.localScreenshotUrl, proj.fallbackScreenshotUrl, shouldLoad, isNear, isExpanded]);
 
     useEffect(() => {
         return () => {
