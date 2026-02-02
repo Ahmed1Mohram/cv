@@ -131,7 +131,7 @@
     <!-- ================= FONTS (OPTIMIZED) ================= -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Almarai:wght@400;700&family=Anton&display=swap" rel="stylesheet">
 
     <!-- ================= TAILWIND ================= -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -143,8 +143,19 @@
             padding: 0;
             background-color: #050505;
             color: white;
-            font-family: 'Inter', sans-serif;
+            font-family: 'Almarai', sans-serif;
+            font-weight: 700;
             overflow: hidden;
+        }
+        
+         :lang(ar) {
+            font-family: 'Almarai', sans-serif;
+            font-weight: 700 !important;
+        }
+        
+         :lang(en) {
+            font-family: 'Anton', sans-serif;
+            font-weight: 400 !important;
         }
         
         #root {

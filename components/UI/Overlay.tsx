@@ -31,6 +31,10 @@ export const Overlay: React.FC = () => {
     return labels[currentSection] ?? '';
   }, [currentSection]);
 
+  const isEnglishLabel = React.useCallback((value: string) => {
+    return /^[\x00-\x7F]+$/.test(value);
+  }, []);
+
   const spaceIconButtonClass = "group relative w-11 h-11 sm:w-14 sm:h-14 rounded-full overflow-hidden bg-white/5 backdrop-blur-md border border-white/20 shadow-[0_0_0_1px_rgba(255,255,255,0.08),0_26px_90px_rgba(0,0,0,0.65)] flex items-center justify-center transition-all duration-300 ease-out hover:bg-white/10 hover:border-white/30 hover:shadow-[0_0_0_1px_rgba(147,197,253,0.32),0_0_40px_rgba(147,197,253,0.22),0_34px_110px_rgba(0,0,0,0.72)] hover:scale-[1.08] active:scale-[0.96] focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-300/70";
   const spaceIconClass = "w-5 h-5 sm:w-7 sm:h-7 text-white/95 drop-shadow-[0_0_14px_rgba(147,197,253,0.24)] transition-transform duration-300 ease-out group-hover:scale-110";
   const spaceNumberClass = "text-[11px] sm:text-sm font-semibold text-white/80 px-3 sm:px-4 py-2 rounded-full bg-white/5 backdrop-blur-md border border-white/15 shadow-[0_0_0_1px_rgba(255,255,255,0.06),0_18px_60px_rgba(0,0,0,0.55)] tracking-wider whitespace-nowrap";
@@ -110,11 +114,11 @@ export const Overlay: React.FC = () => {
                     dir="rtl"
                 >
                     <div className={`mx-auto inline-flex items-center gap-2 px-4 py-2 ${glassPillClass}`}>
-                      <span className="text-[10px] sm:text-[11px] font-semibold tracking-[0.28em] text-white/70">React</span>
+                      <span lang="en" className="text-[10px] sm:text-[11px] font-semibold tracking-[0.28em] text-white/70">React</span>
                       <span className="h-3 w-px bg-white/15" />
-                      <span className="text-[10px] sm:text-[11px] font-semibold tracking-[0.28em] text-white/70">Next.js</span>
+                      <span lang="en" className="text-[10px] sm:text-[11px] font-semibold tracking-[0.28em] text-white/70">Next.js</span>
                       <span className="h-3 w-px bg-white/15" />
-                      <span className="text-[10px] sm:text-[11px] font-semibold tracking-[0.28em] text-white/70">Three.js</span>
+                      <span lang="en" className="text-[10px] sm:text-[11px] font-semibold tracking-[0.28em] text-white/70">Three.js</span>
                       <span className="pointer-events-none absolute inset-0 opacity-70" style={{ background: 'linear-gradient(90deg, rgba(125,211,252,0.10), transparent 42%, rgba(167,139,250,0.10))' }} />
                     </div>
 
@@ -213,8 +217,8 @@ export const Overlay: React.FC = () => {
             aria-hidden="true"
           >
             <div className="flex flex-col items-center gap-2">
-              <div className="text-[10px] sm:text-xs font-semibold tracking-widest text-white/70">
-         Scroll Down
+              <div lang="en" className="text-[10px] sm:text-xs font-semibold tracking-widest text-white/70">
+                Scroll Down
               </div>
               <div className="group relative w-12 h-12 sm:w-14 sm:h-14 rounded-full overflow-hidden bg-white/5 backdrop-blur-md border border-white/15 shadow-[0_0_0_1px_rgba(255,255,255,0.06),0_18px_70px_rgba(0,0,0,0.65)] flex items-center justify-center">
                 <span
@@ -285,7 +289,7 @@ export const Overlay: React.FC = () => {
                          >
                              <div className="flex flex-wrap gap-4 mb-6 justify-end">
                                 {activeInfo.stack.map(tech => (
-                                    <span key={tech} className="relative overflow-hidden px-3 py-1.5 border border-white/18 rounded-full text-[11px] uppercase tracking-widest text-white/80 bg-white/[0.03]">
+                                    <span key={tech} lang={isEnglishLabel(tech) ? 'en' : undefined} className="relative overflow-hidden px-3 py-1.5 border border-white/18 rounded-full text-[11px] uppercase tracking-widest text-white/80 bg-white/[0.03]">
                                         <span className="pointer-events-none absolute inset-0 opacity-70" style={{ background: 'linear-gradient(90deg, rgba(125,211,252,0.08), transparent 55%, rgba(167,139,250,0.08))' }} />
                                         {tech}
                                     </span>

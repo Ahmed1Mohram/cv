@@ -32,6 +32,60 @@ const AdaptiveDprClamp: React.FC<{ min?: number }> = ({ min = 1 }) => {
   return null;
 };
 
+const AdaptiveScrollSpeed: React.FC<{ isMobile: boolean }> = ({ isMobile }) => {
+  const scroll = useScroll();
+  const currentSection = useStore((s) => s.currentSection);
+  const expandedProject = useStore((s) => s.expandedProject);
+
+  const multiplier = React.useMemo(() => {
+    if (isMobile) return 1;
+    if (expandedProject !== null) return 1;
+    if (currentSection >= SECTIONS.SKILLS) return 0.55;
+    return 1.15;
+  }, [currentSection, expandedProject, isMobile]);
+
+  const multRef = React.useRef(multiplier);
+  React.useEffect(() => {
+    multRef.current = multiplier;
+  }, [multiplier]);
+
+  React.useEffect(() => {
+    if (isMobile) return;
+
+    let cancelled = false;
+    let cleanup: (() => void) | null = null;
+
+    const attach = () => {
+      if (cancelled) return;
+      const el = (scroll as any)?.el as HTMLElement | undefined;
+      if (!el) {
+        requestAnimationFrame(attach);
+        return;
+      }
+
+      const onWheel = (e: WheelEvent) => {
+        if (e.ctrlKey) return;
+        e.preventDefault();
+        el.scrollTop += e.deltaY * multRef.current;
+      };
+
+      el.addEventListener('wheel', onWheel, { passive: false });
+      cleanup = () => {
+        el.removeEventListener('wheel', onWheel as any);
+      };
+    };
+
+    attach();
+
+    return () => {
+      cancelled = true;
+      if (cleanup) cleanup();
+    };
+  }, [isMobile, scroll]);
+
+  return null;
+};
+
 type QualityTier = 'low' | 'medium' | 'high';
 
 const ShadowSettings: React.FC<{ enabled: boolean }> = ({ enabled }) => {
@@ -260,6 +314,7 @@ export const Experience: React.FC = () => {
       <Sparkles count={spaceCfg.sparkles} speed={0.25} opacity={0.9} color="#ffffff" size={1.2} scale={[90, 60, 90]} noise={0.85} />
       
       <ScrollControls pages={TOTAL_SECTIONS} damping={scrollDamping} distance={scrollDistance}>
+        <AdaptiveScrollSpeed isMobile={isMobile} />
         <CameraHandler />
         <SceneLights quality={quality} shadowsEnabled={shadowsEnabled} />
         
