@@ -141,7 +141,7 @@ export const Overlay: React.FC = () => {
                     className="absolute top-24 left-1/2 -translate-x-1/2 text-center sm:top-auto sm:left-auto sm:translate-x-0 sm:bottom-20 sm:right-10 sm:text-right max-w-[92vw] pointer-events-auto"
                     dir="rtl"
                 >
-                    <div className={`mx-auto sm:mx-0 px-5 py-4 sm:px-6 sm:py-5 ${glassCardClass}`}>
+                    <div className={`mx-auto sm:mx-0 px-5 py-4 sm:px-6 sm:py-5 bg-slate-950/55 ${glassCardClass}`}>
                       <h2 className="text-2xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight mb-2 sm:mb-3">أعمال مختارة</h2>
                       <p className="max-w-xs sm:max-w-md text-[11px] sm:text-sm text-white/65 mb-1">
                           مجموعة من التجارب التقنية. <br/>

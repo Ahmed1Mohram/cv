@@ -548,13 +548,15 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
                 )}
 
                 <Text 
-                    position={[0, -1.2, 0.1]} 
+                    position={[0, -1.06, 0.1]} 
                     fontSize={isMobile ? 0.32 : 0.4} 
                     font={arFont}
                     color="#f8fafc"
                     anchorX="center" 
                     anchorY="middle"
                     direction="rtl"
+                    maxWidth={3.2}
+                    lineHeight={1.08}
                     fillOpacity={!anyExpanded ? (isActive ? 1 : 0) : 0}
                 >
                     {proj.title}
@@ -562,7 +564,7 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
 
                 {!isExpanded && !anyExpanded && (
                     <Text
-                        position={[0, -1.35, 0.1]}
+                        position={[0, -1.56, 0.1]}
                         fontSize={isMobile ? 0.18 : 0.22}
                         font={arFont}
                         color="#dbe7ff"
@@ -570,7 +572,7 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
                         anchorY="middle"
                         direction="rtl"
                         maxWidth={3.2}
-                        lineHeight={1.15}
+                        lineHeight={1.22}
                         fillOpacity={isActive ? 0.85 : 0}
                     >
                         {proj.subtitle}
@@ -579,7 +581,7 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
 
                 {!isExpanded && !anyExpanded && (
                     <Text
-                        position={[0, -1.5, 0.1]}
+                        position={[0, -1.86, 0.1]}
                         fontSize={isMobile ? 0.19 : 0.22}
                         font={arFont}
                         color="#88ccff"
