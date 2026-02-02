@@ -159,7 +159,7 @@ export const Overlay: React.FC = () => {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -20 }}
-                    className="absolute left-1/2 -translate-x-1/2 pointer-events-auto max-w-[92vw] w-[92vw] sm:w-auto"
+                    className="absolute left-1/2 -translate-x-[58%] sm:-translate-x-1/2 pointer-events-auto max-w-[92vw] w-[92vw] sm:w-auto"
                     style={{ bottom: 'calc(env(safe-area-inset-bottom) + 6rem)' }}
                     dir="rtl"
                 >
