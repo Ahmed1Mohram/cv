@@ -222,7 +222,7 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
     const targetRot = useRef(new THREE.Euler(0, 0, 0));
     const tmpForward = useRef(new THREE.Vector3());
     const tmpTargetPosition = useRef(new THREE.Vector3());
-    const arFont = "https://cdn.jsdelivr.net/npm/@openfonts/tajawal_arabic@1.44.1/files/tajawal-arabic-700.woff";
+    const arFont = "https://cdn.jsdelivr.net/npm/@fontsource/almarai@5.2.5/files/almarai-arabic-700-normal.woff";
 
     const textureRef = useRef<THREE.Texture | null>(null);
     const textureTierRef = useRef<'low' | 'high' | null>(null);
@@ -314,10 +314,10 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
 
             const maxTex = gl?.capabilities?.maxTextureSize || 4096;
             const requestedW = isExpanded
-              ? (isMobile ? 1920 : (isVeryLarge ? 2200 : (isLarge ? 2560 : 2200)))
+              ? (isMobile ? (isVeryLarge ? 2300 : 2048) : (isVeryLarge ? 3200 : (isLarge ? 3072 : 2560)))
               : (isNear
-                  ? (isMobile ? 1280 : (isVeryLarge ? 1400 : 1600))
-                  : (isMobile ? 768 : (isLarge ? 768 : 900)));
+                  ? (isMobile ? 1536 : (isVeryLarge ? 2200 : 2048))
+                  : (isMobile ? 840 : (isLarge ? 900 : 1100)));
 
             const w = Math.min(requestedW, maxTex);
             const h = Math.round(w * (9 / 16));
@@ -483,10 +483,12 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
             const dist = Math.abs(sectionProgress - center);
             const w = 1 - THREE.MathUtils.clamp(dist / (half || 1), 0, 1);
             const zoomT = THREE.MathUtils.smoothstep(w, 0, 1);
-            const s = THREE.MathUtils.lerp(0.86, 1.18, zoomT);
+            const baseMax = isMobile ? 1.32 : 1.42;
+            const s = THREE.MathUtils.lerp(0.9, baseMax, zoomT) * (isActive ? 1.1 : 1);
             
             const rel = THREE.MathUtils.clamp(index - activeIndex, -2, 2);
-            targetPos.current.set(proj.x, 0.65 + floatY + zoomT * 0.1, zoomT * 0.55 + floatZ - Math.abs(rel) * 0.08);
+            const activeBoost = isActive ? 0.06 : 0;
+            targetPos.current.set(proj.x, 0.65 + floatY + zoomT * 0.16 + activeBoost * 0.15, zoomT * 0.66 + floatZ + activeBoost - Math.abs(rel) * 0.1);
             targetScale.current.set(s, s, 1);
             const tiltT = 1 - zoomT;
             targetRot.current.set(0.025 * tiltT, rel * 0.12 * tiltT + sway, rel * 0.03 * tiltT);
@@ -533,7 +535,7 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
                 {shouldLoad && !textureReady && (
                     <Text
                         position={[0, 0, 0.06]}
-                        fontSize={0.18}
+                        fontSize={0.2}
                         font={arFont}
                         color="rgba(255,255,255,0.75)"
                         anchorX="center"
@@ -547,9 +549,9 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
 
                 <Text 
                     position={[0, -1.2, 0.1]} 
-                    fontSize={0.25} 
+                    fontSize={isMobile ? 0.32 : 0.4} 
                     font={arFont}
-                    color="white"
+                    color="#f8fafc"
                     anchorX="center" 
                     anchorY="middle"
                     direction="rtl"
@@ -561,9 +563,9 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
                 {!isExpanded && !anyExpanded && (
                     <Text
                         position={[0, -1.35, 0.1]}
-                        fontSize={0.14}
+                        fontSize={isMobile ? 0.18 : 0.22}
                         font={arFont}
-                        color="#cbd5ff"
+                        color="#dbe7ff"
                         anchorX="center"
                         anchorY="middle"
                         direction="rtl"
@@ -578,7 +580,7 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
                 {!isExpanded && !anyExpanded && (
                     <Text
                         position={[0, -1.5, 0.1]}
-                        fontSize={0.16}
+                        fontSize={isMobile ? 0.19 : 0.22}
                         font={arFont}
                         color="#88ccff"
                         anchorX="center"

@@ -88,14 +88,14 @@ const AdaptiveScrollSpeed: React.FC<{ isMobile: boolean }> = ({ isMobile }) => {
 
 type QualityTier = 'low' | 'medium' | 'high';
 
-const ShadowSettings: React.FC<{ enabled: boolean }> = ({ enabled }) => {
+const ShadowSettings: React.FC<{ enabled: boolean; quality: QualityTier }> = ({ enabled, quality }) => {
   const gl = useThree((s) => s.gl);
 
   React.useEffect(() => {
     gl.shadowMap.enabled = enabled;
-    gl.shadowMap.type = THREE.PCFSoftShadowMap;
+    gl.shadowMap.type = quality === 'high' ? THREE.PCFSoftShadowMap : THREE.PCFShadowMap;
     gl.shadowMap.needsUpdate = true;
-  }, [enabled, gl]);
+  }, [enabled, gl, quality]);
 
   return null;
 };
@@ -131,7 +131,11 @@ const SceneLights: React.FC<{ quality: QualityTier; shadowsEnabled: boolean }> =
   );
 };
 
-const AutoQuality: React.FC<{ quality: QualityTier; setQuality: React.Dispatch<React.SetStateAction<QualityTier>> }> = ({ quality, setQuality }) => {
+const AutoQuality: React.FC<{
+  quality: QualityTier;
+  minQuality: QualityTier;
+  setQuality: React.Dispatch<React.SetStateAction<QualityTier>>;
+}> = ({ quality, minQuality, setQuality }) => {
   const qualityRef = React.useRef<QualityTier>(quality);
   React.useEffect(() => {
     qualityRef.current = quality;
@@ -147,10 +151,10 @@ const AutoQuality: React.FC<{ quality: QualityTier; setQuality: React.Dispatch<R
     const ema = emaFpsRef.current * 0.9 + fps * 0.1;
     emaFpsRef.current = ema;
 
-    if (ema < 52) {
+    if (ema < 48) {
       lowTimeRef.current += dt;
       highTimeRef.current = 0;
-    } else if (ema > 58) {
+    } else if (ema > 59) {
       highTimeRef.current += dt;
       lowTimeRef.current = 0;
     } else {
@@ -158,13 +162,13 @@ const AutoQuality: React.FC<{ quality: QualityTier; setQuality: React.Dispatch<R
       highTimeRef.current *= 0.92;
     }
 
-    if (lowTimeRef.current > 1.2) {
+    if (lowTimeRef.current > 1.6) {
       lowTimeRef.current = 0;
       if (qualityRef.current === 'high') setQuality('medium');
-      else if (qualityRef.current === 'medium') setQuality('low');
+      else if (qualityRef.current === 'medium' && minQuality === 'low') setQuality('low');
     }
 
-    if (highTimeRef.current > 4.0) {
+    if (highTimeRef.current > 5.0) {
       highTimeRef.current = 0;
       if (qualityRef.current === 'low') setQuality('medium');
       else if (qualityRef.current === 'medium') setQuality('high');
@@ -183,6 +187,7 @@ export const Experience: React.FC = () => {
   }, []);
   const scrollDistance = isMobile ? 2.9 : 2.2;
   const scrollDamping = isMobile ? 0.18 : 0.09;
+  const minQuality = React.useMemo<QualityTier>(() => (isMobile ? 'low' : 'medium'), [isMobile]);
 
   const initialQuality = React.useMemo<QualityTier>(() => {
     if (typeof navigator === 'undefined') return isMobile ? 'medium' : 'high';
@@ -220,6 +225,11 @@ export const Experience: React.FC = () => {
     return v;
   }, [inProjects, isMobile, quality]);
 
+  const dprRangeMin = React.useMemo(() => {
+    if (isMobile) return dprMin;
+    return Math.min(dprMin, 0.85);
+  }, [dprMin, isMobile]);
+
   const dprMax = React.useMemo(() => {
     if (expandedProject !== null) {
       if (quality === 'high') return isMobile ? 2.0 : 1.85;
@@ -236,32 +246,33 @@ export const Experience: React.FC = () => {
 
   const spaceCfg = React.useMemo(() => {
     const projectsScale = inProjects ? 0.75 : 1;
+    const skillsScale = inSkills ? (isMobile ? 0.92 : 0.72) : 1;
     if (quality === 'high') {
       return {
-        starsA: Math.round((isMobile ? 950 : 1300) * projectsScale),
-        starsB: Math.round((isMobile ? 190 : 260) * projectsScale),
-        sparkles: Math.round((isMobile ? 95 : 130) * projectsScale),
+        starsA: Math.round((isMobile ? 950 : 1300) * projectsScale * skillsScale),
+        starsB: Math.round((isMobile ? 190 : 260) * projectsScale * skillsScale),
+        sparkles: Math.round((isMobile ? 95 : 130) * projectsScale * skillsScale),
         bloomIntensity: 0.34 * (inProjects ? 0.0 : 1),
         bloomThreshold: 1.35,
       };
     }
     if (quality === 'medium') {
       return {
-        starsA: Math.round(900 * projectsScale),
-        starsB: Math.round(180 * projectsScale),
-        sparkles: Math.round(85 * projectsScale),
+        starsA: Math.round(900 * projectsScale * skillsScale),
+        starsB: Math.round(180 * projectsScale * skillsScale),
+        sparkles: Math.round(85 * projectsScale * skillsScale),
         bloomIntensity: 0.22 * (inProjects ? 0.0 : 1),
         bloomThreshold: 1.6,
       };
     }
     return {
-      starsA: Math.round((isMobile ? 520 : 650) * projectsScale),
-      starsB: Math.round((isMobile ? 110 : 130) * projectsScale),
-      sparkles: Math.round((isMobile ? 35 : 45) * projectsScale),
+      starsA: Math.round((isMobile ? 520 : 650) * projectsScale * skillsScale),
+      starsB: Math.round((isMobile ? 110 : 130) * projectsScale * skillsScale),
+      sparkles: Math.round((isMobile ? 35 : 45) * projectsScale * skillsScale),
       bloomIntensity: 0.14 * (inProjects ? 0.0 : 1),
       bloomThreshold: 1.85,
     };
-  }, [inProjects, isMobile, quality]);
+  }, [inProjects, inSkills, isMobile, quality]);
   const webglAvailable = React.useMemo(() => {
     if (typeof document === 'undefined') return true;
     const c = document.createElement('canvas');
@@ -281,13 +292,13 @@ export const Experience: React.FC = () => {
       shadows={shadowsEnabled}
       gl={{ 
         antialias: quality !== 'low',
-        powerPreference: isMobile ? "high-performance" : "low-power",
+        powerPreference: "high-performance",
         alpha: false
       }}
-      dpr={[dprMin, dprMax]}
+      dpr={[dprRangeMin, dprMax]}
       onCreated={({ gl }) => {
         gl.shadowMap.enabled = shadowsEnabled;
-        gl.shadowMap.type = THREE.PCFSoftShadowMap;
+        gl.shadowMap.type = quality === 'high' ? THREE.PCFSoftShadowMap : THREE.PCFShadowMap;
         const c = gl.domElement;
         const onLost = (e: Event) => {
           e.preventDefault();
@@ -302,12 +313,12 @@ export const Experience: React.FC = () => {
     >
       <color attach="background" args={['#000005']} />
 
-      <AdaptiveDprClamp min={dprMin} />
+      <AdaptiveDprClamp min={dprRangeMin} />
       <AdaptiveEvents />
 
-      <ShadowSettings enabled={shadowsEnabled} />
+      <ShadowSettings enabled={shadowsEnabled} quality={quality} />
 
-      <AutoQuality quality={quality} setQuality={setQuality} />
+      <AutoQuality quality={quality} minQuality={minQuality} setQuality={setQuality} />
       
       <Stars radius={140} depth={90} count={spaceCfg.starsA} factor={0.95} saturation={0.25} fade speed={0.06} />
       <Stars radius={70} depth={35} count={spaceCfg.starsB} factor={1.35} saturation={0.1} fade speed={0.1} />
@@ -325,7 +336,7 @@ export const Experience: React.FC = () => {
         <ContactSection />
       </ScrollControls>
 
-      {quality !== 'low' && !inProjects && (
+      {quality === 'high' && !isMobile && !inProjects && (
         <EffectComposer disableNormalPass multisampling={0}>
           <Bloom luminanceThreshold={spaceCfg.bloomThreshold} mipmapBlur={false} intensity={spaceCfg.bloomIntensity} radius={0.07} />
           <Noise opacity={0.015} />

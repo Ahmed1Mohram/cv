@@ -153,6 +153,82 @@ export const Overlay: React.FC = () => {
                 </motion.div>
             )}
 
+            {currentSection === SECTIONS.ABOUT && (
+                <motion.div
+                    key="about"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.8 }}
+                    className="absolute top-24 left-1/2 -translate-x-1/2 text-center sm:top-auto sm:bottom-20 sm:left-auto sm:translate-x-0 sm:right-10 sm:text-right max-w-[92vw] pointer-events-auto"
+                    dir="rtl"
+                >
+                    <div className={`mx-auto sm:mx-0 px-5 py-5 sm:px-7 sm:py-6 ${glassCardClass}`}>
+                        <span className="pointer-events-none absolute -inset-[2px] rounded-3xl opacity-70 blur-[0.5px]" style={{ background: 'radial-gradient(circle at 35% 25%, rgba(125,211,252,0.18), transparent 58%), radial-gradient(circle at 75% 80%, rgba(167,139,250,0.12), transparent 60%)' }} />
+                        <span className="pointer-events-none absolute inset-0 opacity-70" style={{ background: 'linear-gradient(120deg, rgba(125,211,252,0.06), transparent 55%, rgba(167,139,250,0.07))' }} />
+
+                        <div className={`mx-auto sm:mx-0 inline-flex items-center gap-2 px-4 py-2 ${glassPillClass}`}>
+                            <span className="text-[10px] sm:text-[11px] font-semibold tracking-[0.28em] text-white/70">نبذة سريعة</span>
+                            <span className="h-3 w-px bg-white/15" />
+                            <span lang="en" className="text-[10px] sm:text-[11px] font-semibold tracking-[0.28em] text-white/70">UI / UX</span>
+                            <span className="pointer-events-none absolute inset-0 opacity-70" style={{ background: 'linear-gradient(90deg, rgba(125,211,252,0.10), transparent 42%, rgba(167,139,250,0.10))' }} />
+                        </div>
+
+                        <h2 className="relative mt-4 text-2xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white">
+                            أصمم واجهات فاخرة
+                            <br />
+                            وسريعة وثابتة
+                        </h2>
+
+                        <p className="relative mt-3 text-[12px] sm:text-sm text-white/70 leading-relaxed max-w-md">
+                            اسمي أحمد محرم، مطور واجهات بتركيز قوي على التفاصيل، السلاسة، وتجربة مستخدم محترفة.
+                            هدفي إن الموقع يبقى شكله مميز، ويتحرك بسلاسة، ويشتغل بكفاءة على الموبايل والكمبيوتر.
+                        </p>
+
+                        <div className="relative mt-4 flex flex-wrap gap-2 justify-center sm:justify-end">
+                            {[
+                                { label: 'Performance', lang: 'en' as const },
+                                { label: 'Responsive', lang: 'en' as const },
+                                { label: 'SEO', lang: 'en' as const },
+                                { label: '3D Web', lang: 'en' as const },
+                                { label: 'React', lang: 'en' as const },
+                                { label: 'Three.js', lang: 'en' as const },
+                            ].map((item) => (
+                                <span
+                                    key={item.label}
+                                    lang={item.lang}
+                                    className="relative overflow-hidden px-3 py-1.5 border border-white/18 rounded-full text-[10px] sm:text-[11px] uppercase tracking-widest text-white/80 bg-white/[0.03]"
+                                >
+                                    <span className="pointer-events-none absolute inset-0 opacity-70" style={{ background: 'linear-gradient(90deg, rgba(125,211,252,0.08), transparent 55%, rgba(167,139,250,0.08))' }} />
+                                    <span className="relative">{item.label}</span>
+                                </span>
+                            ))}
+                        </div>
+
+                        <div className="relative mt-5 flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center sm:justify-end">
+                            <a
+                                href={whatsappUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className={primaryButtonClass}
+                            >
+                                <span className="pointer-events-none absolute inset-0 opacity-70" style={{ background: 'radial-gradient(circle at 30% 30%, rgba(255,255,255,0.28), transparent 55%), radial-gradient(circle at 70% 80%, rgba(255,255,255,0.12), transparent 60%)' }} />
+                                <span className="relative">ابدأ مشروعك</span>
+                            </a>
+                            <a
+                                href={facebookUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className={secondaryButtonClass}
+                            >
+                                <span className="pointer-events-none absolute inset-0 opacity-70" style={{ background: 'linear-gradient(90deg, rgba(125,211,252,0.08), transparent 45%, rgba(167,139,250,0.08))' }} />
+                                <span className="relative">تابعني</span>
+                            </a>
+                        </div>
+                    </div>
+                </motion.div>
+            )}
+
             {currentSection === SECTIONS.CONTACT && (
                 <motion.div
                     key="contact"

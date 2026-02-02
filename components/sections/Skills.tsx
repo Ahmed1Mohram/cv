@@ -356,6 +356,7 @@ const Orbit: React.FC<{ radius: number }> = ({ radius }) => {
 
 const Galaxies: React.FC<{ enabledRef: React.MutableRefObject<boolean>; quality: QualityTier }> = ({ enabledRef, quality }) => {
     const group = useRef<THREE.Group>(null);
+    const isMobile = useThree((state) => state.size.width <= 640);
 
     const makeGalaxy = useMemo(() => {
         return (params: {
@@ -414,11 +415,12 @@ const Galaxies: React.FC<{ enabledRef: React.MutableRefObject<boolean>; quality:
     }, []);
 
     const galaxyA = useMemo(() => {
-        const count = quality === 'high'
-            ? 14000
+        const baseCount = quality === 'high'
+            ? 11000
             : quality === 'medium'
-                ? 9000
-                : 4500;
+                ? 7500
+                : 3800;
+        const count = Math.round(baseCount * (isMobile ? 0.7 : 1));
 
         return makeGalaxy({
             count,
@@ -432,14 +434,15 @@ const Galaxies: React.FC<{ enabledRef: React.MutableRefObject<boolean>; quality:
             insideColor: '#fff2cf',
             outsideColor: '#8ab4ff',
         });
-    }, [makeGalaxy, quality]);
+    }, [isMobile, makeGalaxy, quality]);
 
     const galaxyB = useMemo(() => {
-        const count = quality === 'high'
-            ? 10000
+        const baseCount = quality === 'high'
+            ? 8000
             : quality === 'medium'
-                ? 6500
-                : 3200;
+                ? 5200
+                : 2500;
+        const count = Math.round(baseCount * (isMobile ? 0.7 : 1));
 
         return makeGalaxy({
             count,
@@ -453,7 +456,7 @@ const Galaxies: React.FC<{ enabledRef: React.MutableRefObject<boolean>; quality:
             insideColor: '#ffe2f3',
             outsideColor: '#a78bfa',
         });
-    }, [makeGalaxy, quality]);
+    }, [isMobile, makeGalaxy, quality]);
 
     useFrame((state) => {
         if (!group.current) return;
@@ -468,7 +471,7 @@ const Galaxies: React.FC<{ enabledRef: React.MutableRefObject<boolean>; quality:
         <group ref={group} frustumCulled={false}>
             <points geometry={galaxyA} frustumCulled={false}>
                 <pointsMaterial
-                    size={0.18}
+                    size={isMobile ? 0.22 : 0.2}
                     sizeAttenuation
                     transparent
                     opacity={0.6}
@@ -480,7 +483,7 @@ const Galaxies: React.FC<{ enabledRef: React.MutableRefObject<boolean>; quality:
             </points>
             <points geometry={galaxyB} frustumCulled={false}>
                 <pointsMaterial
-                    size={0.16}
+                    size={isMobile ? 0.2 : 0.18}
                     sizeAttenuation
                     transparent
                     opacity={0.55}
